@@ -459,7 +459,7 @@
         <div class="brand-logo">V</div>
         <div class="brand-text">
           <h1>Vyapaar Bot Control</h1>
-          <p>Express · Socket.IO · Baileys · Gemini AI</p>
+          <p>Express · Socket.IO · WhatsApp Multi-Device · Gemini AI</p>
         </div>
       </a>
 
@@ -496,7 +496,7 @@
           </div>
           <div class="device-info-row">
             <span>Protocol Engine:</span>
-            <strong>Baileys Multi-Device v6</strong>
+            <strong>WhatsApp Multi-Device Engine</strong>
           </div>
           <div class="device-info-row">
             <span>AI Brain:</span>
@@ -504,7 +504,7 @@
           </div>
           <div class="device-info-row">
             <span>Auth Session:</span>
-            <strong id="session-status">Local auth_info_baileys</strong>
+            <strong id="session-status">Local auth_info</strong>
           </div>
         </div>
 
@@ -640,7 +640,7 @@
       } else if (data.status === 'connecting') {
         headerStatusText.textContent = 'Connecting...';
         btnToggle.className = 'btn btn-lg btn-outline';
-        btnToggleText.textContent = 'Starting Baileys...';
+        btnToggleText.textContent = 'Starting WhatsApp...';
         deviceNumber.textContent = 'Connecting...';
 
         qrEmptyState.style.display = 'block';

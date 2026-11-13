@@ -252,12 +252,12 @@ async function startWhatsAppSocket() {
   isStartingSocket = true;
 
   try {
-    currentStatus = { state: 'starting', message: 'Initializing Baileys session...' };
+    currentStatus = { state: 'starting', message: 'Initializing WhatsApp session...' };
     io.emit('wa:status', currentStatus);
 
     const { state, saveCreds } = await useMultiFileAuthState(authPath);
     const { version, isLatest } = await fetchLatestBaileysVersion();
-    console.log(`📱 Baileys Multi-Device Engine v${version.join('.')} (Latest: ${isLatest})`);
+    console.log(`📱 WhatsApp Multi-Device Engine v${version.join('.')} (Latest: ${isLatest})`);
 
     sock = makeWASocket({
       version,
@@ -279,7 +279,7 @@ async function startWhatsAppSocket() {
       if (qr) {
         try {
           lastQrDataUrl = await qrcode.toDataURL(qr, { margin: 2, scale: 6 });
-          currentStatus = { state: 'qr', message: 'Scan QR in WhatsApp -> Linked Devices' };
+          currentStatus = { state: 'qr', message: 'Scan QR Code' };
           console.log('📲 QR Code generated! Broadcasting to frontend...');
           io.emit('wa:qr', lastQrDataUrl);
           io.emit('wa:status', currentStatus);
