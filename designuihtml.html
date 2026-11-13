@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="designuicss.css" />
+  <script src="http://localhost:3001/socket.io/socket.io.js"></script>
 </head>
 <body>
 
@@ -1613,6 +1614,36 @@
           </div>
         </div>
 
+        <!-- Live WhatsApp Bot & Baileys Pairing Container -->
+        <div id="wa-live-qr-container" style="background:#ffffff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:16px; margin-bottom:20px; text-align:center;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+            <span style="font-weight:700; font-size:0.92rem; color:var(--text-primary); display:flex; align-items:center; gap:8px;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#25D366" stroke-width="2.5"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+              Live WhatsApp Bot Pairing
+            </span>
+            <span id="wa-live-status-badge" style="display:inline-flex; align-items:center; gap:6px; font-size:0.75rem; font-weight:700; padding:4px 10px; border-radius:999px; background:#FEF3C7; color:#92400E;">
+              <span class="demo-pulse-dot" style="background:#F59E0B; width:6px; height:6px;"></span>
+              Connecting...
+            </span>
+          </div>
+          
+          <div id="wa-live-qr-box" style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:190px; background:#F8FAF9; border:1px dashed var(--border-light); border-radius:8px; padding:14px;">
+            <img id="wa-live-qr-img" src="" alt="WhatsApp Pairing QR Code" style="display:none; max-width:200px; max-height:200px; width:100%; height:auto; margin:0 auto; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.06);" />
+            <div id="wa-live-qr-loading" style="display:flex; flex-direction:column; align-items:center; gap:8px; color:var(--text-muted); font-size:0.85rem;">
+              <div class="demo-pulse-dot" style="background:#10b981; width:10px; height:10px;"></div>
+              <span>Connecting to Baileys engine at http://localhost:3001...</span>
+            </div>
+            <div id="wa-live-connected-box" style="display:none; flex-direction:column; align-items:center; gap:8px; padding:12px; color:#047857;">
+              <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+              <strong style="font-size:1.05rem; color:#065f46;">🟢 WhatsApp Bot Live &amp; Listening</strong>
+              <span style="font-size:0.85rem; color:#047857; max-width:320px; line-height:1.4;">Send any WhatsApp message from your phone to test your AI catalog assistant live.</span>
+            </div>
+          </div>
+          <p id="wa-live-qr-hint" style="margin-top:12px; font-size:0.82rem; color:var(--text-muted); line-height:1.4;">
+            Open WhatsApp on your phone &rarr; Settings &rarr; Linked Devices &rarr; Link a Device.
+          </p>
+        </div>
+
         <div class="launch-btns-row">
           <button type="button" class="btn btn-primary btn-lg btn-block" onclick="closeLaunchModal(); goToStep(3);">
             Open Merchant Operations Workspace (Step 3) →
@@ -2418,25 +2449,142 @@
       renderManualTable();
     }
 
+    // WhatsApp Bot Backend Live Integration (Baileys + Gemini on port 3001)
+    let waLiveSocket = null;
+
+    function connectWhatsAppSocket() {
+      if (waLiveSocket) return waLiveSocket;
+      if (typeof io === 'undefined') {
+        console.warn('Socket.IO client library not found. Please ensure backend on port 3001 is running.');
+        return null;
+      }
+      try {
+        waLiveSocket = io('http://localhost:3001', {
+          transports: ['websocket', 'polling'],
+          reconnectionAttempts: 10,
+          reconnectionDelay: 1000
+        });
+
+        waLiveSocket.on('connect', () => {
+          console.log('✅ Connected to WhatsApp Bot backend at http://localhost:3001');
+        });
+
+        waLiveSocket.on('wa:status', (data) => {
+          updateWaLiveStatus(data);
+        });
+
+        waLiveSocket.on('wa:qr', (qrDataUrl) => {
+          const qrImg = document.getElementById('wa-live-qr-img');
+          const qrLoading = document.getElementById('wa-live-qr-loading');
+          const connectedBox = document.getElementById('wa-live-connected-box');
+          const qrHint = document.getElementById('wa-live-qr-hint');
+
+          if (qrImg) {
+            qrImg.src = qrDataUrl;
+            qrImg.style.display = 'block';
+          }
+          if (qrLoading) qrLoading.style.display = 'none';
+          if (connectedBox) connectedBox.style.display = 'none';
+          if (qrHint) qrHint.textContent = 'Scan this QR code in WhatsApp → Linked Devices to link and activate your bot.';
+        });
+      } catch (err) {
+        console.error('Failed to initialize socket connection:', err);
+      }
+      return waLiveSocket;
+    }
+
+    function updateWaLiveStatus(data) {
+      const badge = document.getElementById('wa-live-status-badge');
+      const qrImg = document.getElementById('wa-live-qr-img');
+      const qrLoading = document.getElementById('wa-live-qr-loading');
+      const connectedBox = document.getElementById('wa-live-connected-box');
+      const qrHint = document.getElementById('wa-live-qr-hint');
+
+      const state = typeof data === 'string' ? data : (data?.state || 'starting');
+      const message = (typeof data === 'object' && data?.message) ? data.message : '';
+
+      if (!badge) return;
+
+      if (state === 'starting') {
+        badge.style.background = '#FEF3C7';
+        badge.style.color = '#92400E';
+        badge.innerHTML = '<span class="demo-pulse-dot" style="background:#F59E0B; width:6px; height:6px;"></span> Connecting...';
+        if (qrLoading) {
+          qrLoading.style.display = 'flex';
+          qrLoading.innerHTML = '<div class="demo-pulse-dot" style="background:#F59E0B; width:10px; height:10px;"></div><span>Starting Baileys WhatsApp Engine...</span>';
+        }
+        if (qrImg) qrImg.style.display = 'none';
+        if (connectedBox) connectedBox.style.display = 'none';
+      } else if (state === 'qr') {
+        badge.style.background = '#DBEAFE';
+        badge.style.color = '#1E40AF';
+        badge.innerHTML = 'Scan QR in WhatsApp &rarr; Linked Devices';
+        if (qrLoading) qrLoading.style.display = 'none';
+        if (connectedBox) connectedBox.style.display = 'none';
+        if (qrHint) qrHint.textContent = 'Open WhatsApp on your phone &rarr; Settings &rarr; Linked Devices &rarr; Link a Device.';
+      } else if (state === 'connected') {
+        badge.style.background = '#D1FAE5';
+        badge.style.color = '#065F46';
+        badge.innerHTML = '🟢 WhatsApp Bot Live &amp; Listening';
+        if (qrImg) qrImg.style.display = 'none';
+        if (qrLoading) qrLoading.style.display = 'none';
+        if (connectedBox) connectedBox.style.display = 'flex';
+        if (qrHint) qrHint.innerHTML = '<strong style="color:#047857;">Ready!</strong> Send any WhatsApp message to your linked number to test the AI shopping assistant live.';
+      } else if (state === 'disconnected') {
+        badge.style.background = '#FEE2E2';
+        badge.style.color = '#991B1B';
+        badge.innerHTML = 'Disconnected';
+        if (qrHint) qrHint.textContent = message || 'Session disconnected. Reconnecting...';
+      }
+    }
+
     function launchStorefront() {
       const occKey = vyapaarApp.selectedOccupation || 'retailer';
       const occData = vyapaarApp.occupations[occKey] || vyapaarApp.occupations.retailer;
       const biz = vyapaarApp.businessDetails || {};
+
+      const storeName = biz.storeName || document.getElementById('biz-store-name')?.value || 'FreshBasket Kirana';
+      const phone = biz.phone || document.getElementById('biz-phone')?.value || '9876543210';
+      const deliveryMode = biz.deliveryMode || document.querySelector('input[name="delivery_mode"]:checked')?.value || 'local';
+
+      const pipeline = vyapaarApp.pipelines[occKey] || vyapaarApp.pipelines.retailer;
+      const activeStages = (pipeline.stages || []).filter(s => s.active !== false).map(s => ({
+        stageNum: s.stageNum,
+        tag: s.tag,
+        title: s.title,
+        desc: s.desc
+      }));
+
+      const catalog = (vyapaarApp.manualItems && vyapaarApp.manualItems.length > 0)
+        ? vyapaarApp.manualItems
+        : (vyapaarApp.catalogSamples[occKey] || vyapaarApp.catalogSamples.retailer);
 
       const modalStore = document.getElementById('modal-summary-store');
       const modalPhone = document.getElementById('modal-summary-phone');
       const modalOcc = document.getElementById('modal-summary-occ');
       const modalItems = document.getElementById('modal-summary-items');
 
-      if (modalStore) modalStore.textContent = biz.storeName || document.getElementById('biz-store-name')?.value || 'FreshBasket Kirana';
-      if (modalPhone) {
-        const p = biz.phone || document.getElementById('biz-phone')?.value || '9876543210';
-        modalPhone.textContent = '+91 ' + p;
-      }
+      if (modalStore) modalStore.textContent = storeName;
+      if (modalPhone) modalPhone.textContent = '+91 ' + phone;
       if (modalOcc) modalOcc.textContent = occData.name;
-      if (modalItems) {
-        const count = vyapaarApp.manualItems.length > 0 ? vyapaarApp.manualItems.length : (vyapaarApp.catalogSamples[occKey] || []).length;
-        modalItems.textContent = `${count} SKUs Synced to WhatsApp`;
+      if (modalItems) modalItems.textContent = `${catalog.length} SKUs Synced to WhatsApp`;
+
+      // Emit launch-store-bot payload to http://localhost:3001
+      try {
+        const socket = connectWhatsAppSocket();
+        if (socket) {
+          updateWaLiveStatus({ state: 'starting', message: 'Connecting to Baileys engine...' });
+          socket.emit('launch-store-bot', {
+            storeName,
+            phone,
+            occupation: occData.name,
+            deliveryMode,
+            activeStages,
+            catalog
+          });
+        }
+      } catch (err) {
+        console.error('Error emitting launch-store-bot:', err);
       }
 
       const modal = document.getElementById('modal-launch-success');
