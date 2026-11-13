@@ -1471,8 +1471,21 @@
               </button>
             </div>
 
-            <!-- Scanner Status Terminal Simulation -->
-            <div class="scanner-status-box" id="scanner-status-box">
+            <!-- Empty Placeholder Prompt (Displayed Before Clicking Scrape Button) -->
+            <div id="scraper-placeholder-box" class="scraper-placeholder-box">
+              <div class="scraper-placeholder-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="2" y1="12" x2="22" y2="12"/>
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                </svg>
+              </div>
+              <h4>No products extracted yet</h4>
+              <p>Enter your website or online menu link above and click <strong>"Scrape & Extract Products"</strong>. Vyapaar's AI web crawler will discover items, descriptions, verified prices, and high-res images in real time.</p>
+            </div>
+
+            <!-- Scanner Status Terminal Simulation (Hidden by default, active during scrape) -->
+            <div class="scanner-status-box" id="scanner-status-box" style="display:none;">
               <div class="scanner-top-row">
                 <div class="scanner-pill">
                   <span class="demo-pulse-dot"></span>
@@ -1488,8 +1501,8 @@
               </div>
             </div>
 
-            <!-- Scraped Products Grid Container -->
-            <div class="scraped-products-grid" id="scraped-products-container">
+            <!-- Scraped Products Grid Container (Hidden by default, revealed only upon scrape) -->
+            <div class="scraped-products-grid" id="scraped-products-container" style="display:none;">
               <!-- Rendered by JavaScript -->
             </div>
           </div>
@@ -1788,6 +1801,7 @@
       if (!data) return;
 
       vyapaarApp.selectedOccupation = key;
+      vyapaarApp.hasScraped = false;
       localStorage.setItem('vyapaar_occupation', key);
 
       // Update Card Visual States
@@ -2187,12 +2201,12 @@
         { name: "India Gate Basmati Rice (5kg)", cat: "Rice & Grains", price: 480, stock: "In Stock (12)" }
       ],
       restaurant: [
-        { name: "Paneer Tikka Pizza (10-inch)", cat: "Woodfired Pizza", price: 349, stock: "Ready to Fire" },
-        { name: "Dum Murgh Biryani (Handi)", cat: "Biryanis & Rice", price: 389, stock: "Ready to Fire" },
-        { name: "Crispy Chilli Babycorn", cat: "Starters & Appetizers", price: 210, stock: "Ready to Fire" },
-        { name: "Dal Makhani (Slow Cooked)", cat: "Main Course", price: 260, stock: "Ready to Fire" },
-        { name: "Gulab Jamun (2 Pieces)", cat: "Desserts", price: 80, stock: "In Kitchen" },
-        { name: "Diet Coke Can (300ml)", cat: "Beverages", price: 40, stock: "Chilled (30)" }
+        { name: "Paneer Tikka Pizza (10-inch)", cat: "Woodfired Pizza", price: 349, stock: "Ready to Fire", image: "images/pizza.jpg" },
+        { name: "Dum Murgh Biryani (Handi)", cat: "Biryanis & Rice", price: 389, stock: "Ready to Fire", image: "images/biryani.jpg" },
+        { name: "Crispy Chilli Babycorn", cat: "Starters & Appetizers", price: 210, stock: "Ready to Fire", image: "images/babycorn.jpg" },
+        { name: "Dal Makhani (Slow Cooked)", cat: "Main Course", price: 260, stock: "Ready to Fire", image: "images/dal.jpg" },
+        { name: "Gulab Jamun (2 Pieces)", cat: "Desserts", price: 80, stock: "In Kitchen", image: "images/gulabjamun.jpg" },
+        { name: "Diet Coke Can (300ml)", cat: "Beverages", price: 40, stock: "Chilled (30)", image: "images/coke.jpg" }
       ],
       d2c: [
         { name: "Aura Linen Oversized Shirt - Sage", cat: "Men's Apparel", price: 1499, stock: "8 in stock" },
@@ -2255,7 +2269,9 @@
     function runWebsiteScraper() {
       const urlInput = document.getElementById('input-website-url');
       const urlVal = urlInput?.value.trim() || 'www.freshbasket.in';
+      const placeholder = document.getElementById('scraper-placeholder-box');
       const terminal = document.getElementById('scanner-status-box');
+      const container = document.getElementById('scraped-products-container');
       const progressBar = document.getElementById('scanner-progress-bar');
       const logsList = document.getElementById('scanner-logs');
       const displayUrl = document.getElementById('scanner-url-display');
@@ -2263,11 +2279,14 @@
 
       if (!terminal) return;
 
+      if (placeholder) placeholder.style.display = 'none';
+      if (container) container.style.display = 'none';
       terminal.style.display = 'block';
+
       if (displayUrl) displayUrl.textContent = `Target: https://${urlVal.replace(/^https?:\/\//, '')}`;
       if (btnScrape) {
         btnScrape.disabled = true;
-        btnScrape.innerHTML = '<span>Crawling...</span>';
+        btnScrape.innerHTML = '<span>Crawling Menu & Images...</span>';
       }
 
       logsList.innerHTML = '<li>[1/4] Handshaking with target domain & fetching sitemap index...</li>';
@@ -2276,24 +2295,29 @@
       setTimeout(() => {
         logsList.innerHTML += '<li>[2/4] Discovered catalog routes & parsing structured schema.org / OpenGraph tags...</li>';
         progressBar.style.width = '55%';
-      }, 700);
+      }, 650);
 
       setTimeout(() => {
-        logsList.innerHTML += '<li>[3/4] Extracting high-res images, title strings, descriptions, and integer paise prices...</li>';
+        logsList.innerHTML += '<li>[3/4] Extracting high-res dish photos, descriptions, and verified prices...</li>';
         progressBar.style.width = '85%';
-      }, 1400);
+      }, 1300);
 
       setTimeout(() => {
-        const occKey = vyapaarApp.selectedOccupation || 'retailer';
-        const sampleCount = (vyapaarApp.catalogSamples[occKey] || vyapaarApp.catalogSamples.retailer).length;
+        const occKey = vyapaarApp.selectedOccupation || 'restaurant';
+        const sampleCount = (vyapaarApp.catalogSamples[occKey] || vyapaarApp.catalogSamples.restaurant).length;
         logsList.innerHTML += `<li style="color:#6EE7B7; font-weight:700;">[4/4] ✨ Complete! ${sampleCount} in-stock products verified and formatted for WhatsApp Cloud API.</li>`;
         progressBar.style.width = '100%';
         if (btnScrape) {
           btnScrape.disabled = false;
           btnScrape.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg><span>Scrape & Extract Products</span>';
         }
+        vyapaarApp.hasScraped = true;
         renderScrapedProducts();
-      }, 2100);
+        if (container) {
+          container.style.display = 'grid';
+          container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      }, 2000);
     }
 
     function renderScrapedProducts() {
@@ -2314,7 +2338,9 @@
 
       container.innerHTML = items.map(item => `
         <div class="product-item-card">
-          <div class="prod-thumb-box">${icon}</div>
+          <div class="prod-thumb-box">
+            ${item.image ? `<img src="${item.image}" alt="${item.name}" loading="lazy" onerror="this.onerror=null; this.parentElement.innerHTML='<span style=\\'font-size:2.2rem;\\'>${icon}</span>';" />` : `<span style="font-size:2.2rem;">${icon}</span>`}
+          </div>
           <div>
             <div class="prod-meta-top">
               <span class="prod-cat-tag">${item.cat}</span>
@@ -2429,7 +2455,40 @@
       if (btnPresetLabel) {
         btnPresetLabel.textContent = `Load ${occData.name} Starter Presets`;
       }
-      renderScrapedProducts();
+
+      const urlInput = document.getElementById('input-website-url');
+      if (urlInput) {
+        const defaultUrls = {
+          retailer: 'www.freshbasket.in',
+          restaurant: 'www.freshbasket.in/menu',
+          d2c: 'www.aurafashion.co',
+          distributor: 'www.balajifmcg.com',
+          pharmacy: 'www.sanjeevanimedicals.in',
+          local_business: 'www.urbanclap-proservices.in'
+        };
+        urlInput.value = defaultUrls[occKey] || 'www.freshbasket.in';
+      }
+
+      // Hide catalog until Scrape button is clicked!
+      const placeholder = document.getElementById('scraper-placeholder-box');
+      const terminal = document.getElementById('scanner-status-box');
+      const container = document.getElementById('scraped-products-container');
+
+      if (!vyapaarApp.hasScraped) {
+        if (placeholder) placeholder.style.display = 'block';
+        if (terminal) terminal.style.display = 'none';
+        if (container) {
+          container.style.display = 'none';
+          container.innerHTML = '';
+        }
+      } else {
+        if (placeholder) placeholder.style.display = 'none';
+        if (terminal) terminal.style.display = 'block';
+        if (container) {
+          renderScrapedProducts();
+          container.style.display = 'grid';
+        }
+      }
     }
 
     // Initialize on Load
