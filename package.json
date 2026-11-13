@@ -1,0 +1,14 @@
+{
+  "name": "vyapaar",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "packageManager": "pnpm@12.18.0",
+  "scripts": {
+    "dev": "pnpm --filter @vyapaar/api dev",
+    "api:dev": "pnpm --filter @vyapaar/api dev",
+    "build": "pnpm -r --if-present build",
+    "test": "pnpm -r --if-present test",
+    "check:env": "node check-env.js"
+  }
+}
