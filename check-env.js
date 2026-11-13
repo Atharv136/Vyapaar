@@ -1,10 +1,21 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const envPath = path.join(__dirname, '.env');
+const examplePath = path.join(__dirname, '.env.example');
+
 if (!fs.existsSync(envPath)) {
-    console.log("Error: .env file does not exist.");
-    process.exit(1);
+    if (fs.existsSync(examplePath)) {
+        console.log("Notice: .env was not found. Initialized .env template from .env.example.\n");
+        fs.copyFileSync(examplePath, envPath);
+    } else {
+        console.log("Error: .env file does not exist.");
+        process.exit(1);
+    }
 }
 
 const envContent = fs.readFileSync(envPath, 'utf8');

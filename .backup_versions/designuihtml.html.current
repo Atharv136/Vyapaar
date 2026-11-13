@@ -1,0 +1,2500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vyapaar — AI-Powered WhatsApp Commerce & Sales Infrastructure</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="designuicss.css" />
+</head>
+<body>
+
+  <!-- Hand-drawn SVG Symbol Definitions (Reusable Doodles) -->
+  <svg style="display:none;" aria-hidden="true">
+    <defs>
+      <!-- Checkmark -->
+      <symbol id="icon-check" viewBox="0 0 20 20">
+        <path d="M16.7 5.3a1 1 0 0 1 0 1.4l-8 8a1 1 0 0 1-1.4 0l-4-4a1 1 0 1 1 1.4-1.4L8 12.6l7.3-7.3a1 1 0 0 1 1.4 0z" fill="currentColor"/>
+      </symbol>
+      <!-- Hand-drawn underline squiggle -->
+      <symbol id="doodle-underline" viewBox="0 0 220 18">
+        <path d="M3 12C55 4 145 3 217 11" stroke="currentColor" stroke-width="4" stroke-linecap="round" fill="none"/>
+        <path d="M24 16C85 11 155 11 198 15" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" fill="none" opacity="0.65"/>
+      </symbol>
+      <!-- Hand-drawn curved arrow -->
+      <symbol id="doodle-arrow" viewBox="0 0 80 50">
+        <path d="M6 38C25 14 52 12 70 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" fill="none" stroke-dasharray="4 4"/>
+        <path d="M61 15L72 25L58 29" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </symbol>
+      <!-- Sparkle doodle -->
+      <symbol id="doodle-sparkle" viewBox="0 0 36 36">
+        <path d="M18 3C18 12 24 18 33 18C24 18 18 24 18 33C18 24 12 18 3 18C12 18 18 12 18 3Z" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" fill="none"/>
+      </symbol>
+      <!-- Voice waveform doodle -->
+      <symbol id="doodle-voice" viewBox="0 0 120 32">
+        <line x1="6" y1="12" x2="6" y2="20" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+        <line x1="16" y1="7" x2="16" y2="25" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+        <line x1="26" y1="3" x2="26" y2="29" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+        <line x1="36" y1="9" x2="36" y2="23" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+        <line x1="46" y1="5" x2="46" y2="27" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+        <line x1="56" y1="11" x2="56" y2="21" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+        <line x1="66" y1="4" x2="66" y2="28" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+        <line x1="76" y1="8" x2="76" y2="24" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+        <line x1="86" y1="13" x2="86" y2="19" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+        <line x1="96" y1="6" x2="96" y2="26" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+        <line x1="106" y1="10" x2="106" y2="22" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+      </symbol>
+    </defs>
+  </svg>
+
+  <!-- Multi-Step Onboarding Journey Top Bar -->
+
+  <!-- =========================================================================
+       MASTER VIEW 1: PUBLIC MARKETING LANDING PAGE (DEFAULT ENTRY VIEW)
+       ========================================================================= -->
+  <div id="view-landing" class="master-view">
+    <header class="navbar">
+    <div class="container nav-inner">
+      <a href="#" class="brand">
+        <span class="brand-mark">
+          <svg width="24" height="24" viewBox="0 0 28 28" fill="none">
+            <path d="M14 3C7.925 3 3 7.62 3 13.32C3 15.65 3.82 17.8 5.21 19.53L4 24.5L9.28 23.15C10.72 23.84 12.32 24.22 14 24.22C20.075 24.22 25 19.6 25 13.9C25 8.2 20.075 3 14 3Z" stroke="#0A3622" stroke-width="2.2" stroke-linejoin="round" fill="#D1FAE5"/>
+            <path d="M9.5 13.5C10.8 15.2 12.5 16 14.5 16C16.5 16 18 14.8 18.8 13.2" stroke="#0A3622" stroke-width="2.2" stroke-linecap="round"/>
+            <circle cx="10.5" cy="10.5" r="1.3" fill="#0A3622"/>
+            <circle cx="17.5" cy="10.5" r="1.3" fill="#0A3622"/>
+          </svg>
+        </span>
+        <span class="brand-name">Vyapaar</span>
+        <span class="brand-tag">WhatsApp Cloud API</span>
+      </a>
+
+      <nav class="nav-links" aria-label="Primary Navigation">
+        <a href="#problem">Why WhatsApp</a>
+        <a href="#multimodal">Multimodal AI</a>
+        <a href="#platform-modes">Commerce & Leads</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#dashboard">Merchant CRM</a>
+        <a href="#pricing">Pricing</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button type="button" class="btn btn-ghost" id="nav-merchant-btn" onclick="startOnboarding(null, 2)">Merchant Login</button>
+        <button type="button" class="btn btn-primary btn-nav-get-started" onclick="startOnboarding()">Get Started →</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       STEP 3: PERSONALIZED PROCESS FLOW ARCHITECTURE BANNER & SELECTOR
+       ========================================================================== -->
+
+    <main>
+    <!-- HERO SECTION -->
+    <section id="hero-main" class="hero">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <div class="pill-badge">
+            <svg width="16" height="16"><use href="#doodle-sparkle"/></svg>
+            <span>Not another rigid chatbot — Full Conversational Commerce</span>
+          </div>
+
+          <h1 class="hero-title">
+            Bring e-commerce into the way customers
+            <span class="highlight-wrap">
+              already talk.
+              <svg class="doodle-line" aria-hidden="true"><use href="#doodle-underline"/></svg>
+            </span>
+          </h1>
+
+          <p class="hero-subtitle">
+            Customers discover products, send voice notes, snap handwritten grocery lists, book appointments, and pay—all inside a single WhatsApp chat. No apps to install, no websites to navigate.
+          </p>
+
+          <div class="hero-cta-group">
+            <button type="button" class="btn btn-primary btn-lg btn-nav-get-started" onclick="startOnboarding()">Get Started Free →</button>
+            <a href="#demo-flow" class="btn btn-outline btn-lg">Explore Live Flow ↓</a>
+          </div>
+
+          <div class="hero-trust-strip">
+            <div class="trust-item">
+              <span class="trust-dot"></span>
+              <span>Official Meta Cloud API & Flows</span>
+            </div>
+            <div class="trust-item">
+              <span class="trust-dot"></span>
+              <span>Hindi-English & Regional Voice STT</span>
+            </div>
+            <div class="trust-item">
+              <span class="trust-dot"></span>
+              <span>Deterministic Inventory & UPI</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interactive-Looking WhatsApp Storefront Mockup with Doodles -->
+        <div class="hero-visual">
+          <!-- Floating Hand-drawn Doodle Callout 1 -->
+          <div class="doodle-callout callout-voice">
+            <span class="callout-label">Voice note in Hinglish</span>
+            <svg class="callout-arrow" width="64" height="40"><use href="#doodle-arrow"/></svg>
+          </div>
+
+          <!-- Floating Hand-drawn Doodle Callout 2 -->
+          <div class="doodle-callout callout-photo">
+            <span class="callout-label">Handwritten list OCR</span>
+            <svg class="callout-arrow flip-x" width="64" height="40"><use href="#doodle-arrow"/></svg>
+          </div>
+
+          <div class="phone-frame">
+            <div class="phone-header">
+              <div class="store-avatar">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                  <path d="M4 9L6 4H18L20 9M4 9H20M4 9V19C4 19.55 4.45 20 5 20H19C19.55 20 20 19.55 20 19V9" stroke="#0A3622" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div class="store-meta">
+                <div class="store-name">
+                  <span>FreshBasket Kirana & Mart</span>
+                  <span class="verified-tick" title="Verified Business">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                      <circle cx="8" cy="8" r="7" fill="#10B981"/>
+                      <path d="M5 8.2L7 10.2L11.2 6" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </span>
+                </div>
+                <span class="store-status">AI Commerce Assistant · Live Stock Synced</span>
+              </div>
+            </div>
+
+            <div class="chat-canvas">
+              <!-- Customer Voice Note -->
+              <div class="msg msg-user">
+                <div class="voice-bubble">
+                  <span class="play-circle">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                      <path d="M3 2L10 6L3 10V2Z" fill="#0A3622"/>
+                    </svg>
+                  </span>
+                  <svg class="voice-bars" width="110" height="24"><use href="#doodle-voice"/></svg>
+                  <span class="voice-time">0:14</span>
+                </div>
+                <p class="transcript-note">"Bhaiya, send my usual groceries plus two packets of Amul Taaza milk and this item from my list."</p>
+              </div>
+
+              <!-- Customer Handwritten Photo Snippet -->
+              <div class="msg msg-user msg-photo">
+                <div class="handwritten-card">
+                  <div class="paper-lines">
+                    <span>1. Tata Salt — 1 kg</span>
+                    <span>2. Bru Coffee — 100g</span>
+                    <span>3. Aashirvaad Atta — 5kg</span>
+                  </div>
+                  <span class="ocr-badge">OCR Extracted · 3 items</span>
+                </div>
+              </div>
+
+              <!-- AI Response with Verified Cart -->
+              <div class="msg msg-ai">
+                <p class="ai-greeting">Prepared your <strong>My Usual</strong> basket and matched your handwritten list against live store inventory:</p>
+                <div class="wa-cart-card">
+                  <div class="cart-header">
+                    <span>Verified Store Cart (5 Items)</span>
+                    <span class="stock-pill">In Stock</span>
+                  </div>
+                  <ul class="cart-list">
+                    <li><span>Amul Taaza Toned Milk (1L) × 2</span><strong>₹112</strong></li>
+                    <li><span>Whole Wheat Bread × 1</span><strong>₹45</strong></li>
+                    <li><span>Tata Iodized Salt (1kg) × 1</span><strong>₹28</strong></li>
+                    <li><span>Bru Instant Coffee (100g) × 1</span><strong>₹215</strong></li>
+                    <li><span>Aashirvaad Select Atta (5kg) × 1</span><strong>₹265</strong></li>
+                  </ul>
+                  <div class="cart-footer">
+                    <span>Total (Free Delivery)</span>
+                    <strong>₹665</strong>
+                  </div>
+                  <div class="wa-interactive-btns">
+                    <span class="wa-btn wa-btn-confirm">Confirm & Pay via UPI</span>
+                    <span class="wa-btn wa-btn-edit">Edit Quantities</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: THE PROBLEM & DIGITAL ACCESSIBILITY GAP -->
+    <section id="problem" class="section section-tinted">
+      <div class="container">
+        <div class="section-header center">
+          <span class="eyebrow">Bridging the Digital Accessibility Gap</span>
+          <h2>Why traditional e-commerce leaves millions behind</h2>
+          <p>Older shoppers, regional-language speakers, and busy everyday buyers shouldn't have to wrestle with search bars, filters, or multi-screen checkouts.</p>
+        </div>
+
+        <div class="problem-grid">
+          <article class="doodle-card">
+            <div class="card-doodle-icon bg-amber">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="9" stroke="#92400E" stroke-width="2"/>
+                <path d="M12 7V12L15 14" stroke="#92400E" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <h3>Delayed Merchant Replies</h3>
+            <p>Customers message a business on WhatsApp, wait hours for manual price checks, and abandon their purchase.</p>
+          </article>
+
+          <article class="doodle-card">
+            <div class="card-doodle-icon bg-mint">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+                <rect x="4" y="4" width="16" height="16" rx="3" stroke="#065F46" stroke-width="2"/>
+                <path d="M8 9H16M8 13H13M8 17H11" stroke="#065F46" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <h3>Complex Catalogs & Forms</h3>
+            <p>Navigating websites, typing exact English spellings, and filling checkout forms creates friction for everyday buyers.</p>
+          </article>
+
+          <article class="doodle-card">
+            <div class="card-doodle-icon bg-coral">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+                <path d="M8 9H16M8 15H16M10 5L8 19M16 5L14 19" stroke="#9F1239" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <h3>Rigid "Press 1" Chatbots</h3>
+            <p>Menu-tree bots break the moment a customer asks a contextual question or sends a mixed grocery list in one message.</p>
+          </article>
+
+          <article class="doodle-card">
+            <div class="card-doodle-icon bg-sky">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+                <path d="M20 7L12 3L4 7V17L12 21L20 17V7Z" stroke="#075985" stroke-width="2" stroke-linejoin="round"/>
+                <path d="M12 12L20 7M12 12V21M12 12L4 7" stroke="#075985" stroke-width="2"/>
+              </svg>
+            </div>
+            <h3>Disconnected Stock & RTO</h3>
+            <p>Selling out-of-stock items causes refunds, while unverified COD orders trigger costly Return-to-Origin (RTO) losses.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: MULTIMODAL AI SHOPPING ASSISTANT (CORE DIFFERENTIATOR) -->
+    <section id="multimodal" class="section">
+      <div class="container">
+        <div class="section-header">
+          <span class="eyebrow">Module A · Multimodal Intelligence</span>
+          <h2>Speak it, snap it, or describe it naturally</h2>
+          <p>Three first-class input pipelines built specifically for Indian shopping habits—backed by strict confirmation guardrails so the AI never guesses blindly.</p>
+        </div>
+
+        <div class="multimodal-showcase">
+          <!-- Pipeline 1: Audio-to-Order -->
+          <div class="feature-panel">
+            <div class="panel-badge">01 · Audio-to-Order</div>
+            <h3>Multilingual Voice Note Ordering</h3>
+            <p>Supports code-switched Hindi-English, Konkani, Marathi, and regional accents. Extracts multiple SKUs, weights, and conversational edits in seconds.</p>
+            <div class="sketch-box">
+              <div class="sketch-row">
+                <span class="sketch-tag">Voice Input</span>
+                <span class="sketch-text">"Ek kilo cheeni aur do packet doodh bhej do"</span>
+              </div>
+              <div class="sketch-divider">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 5V19M12 19L7 14M12 19L17 14" stroke="#10B981" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div class="sketch-row">
+                <span class="sketch-tag tag-green">Structured Cart</span>
+                <span class="sketch-text">Sugar (1kg) × 1 · Toned Milk (500ml) × 2</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pipeline 2: Photo-to-Order -->
+          <div class="feature-panel">
+            <div class="panel-badge">02 · Photo-to-Order</div>
+            <h3>Handwritten Lists & Visual Product Search</h3>
+            <p>Dual-pipeline vision engine: reads handwritten paper lists via OCR or identifies unidentified appliances and parts from a camera snap.</p>
+            <div class="sketch-box">
+              <div class="sketch-row">
+                <span class="sketch-tag">Camera Snap</span>
+                <span class="sketch-text">Photo of a broken mixer jar or handwritten note</span>
+              </div>
+              <div class="sketch-divider">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 5V19M12 19L7 14M12 19L17 14" stroke="#10B981" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div class="sketch-row">
+                <span class="sketch-tag tag-green">Candidate Cards</span>
+                <span class="sketch-text">"Looks like a 500ml chutney jar. Which of these 3 fits?"</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pipeline 3: Discovery & Memory -->
+          <div class="feature-panel">
+            <div class="panel-badge">03 · Personalized Memory</div>
+            <h3>"My Usual", Wishlist & Smart Alternatives</h3>
+            <p>Remembers repeat baskets for 1-tap reorders, tracks wishlist price drops, and suggests in-stock substitutes when a preferred brand runs out.</p>
+            <div class="sketch-box">
+              <div class="sketch-row">
+                <span class="sketch-tag">Customer Intent</span>
+                <span class="sketch-text">"Send my monthly usuals, skip the rice this time."</span>
+              </div>
+              <div class="sketch-divider">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 5V19M12 19L7 14M12 19L17 14" stroke="#10B981" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div class="sketch-row">
+                <span class="sketch-tag tag-green">Instant Recall</span>
+                <span class="sketch-text">Rebuilds 6-item history minus Rice · Ready to confirm</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: DUAL ENGINE — COMMERCE MODE & LEAD AUTOMATION MODE -->
+    <section id="platform-modes" class="section section-mint">
+      <div class="container">
+        <div class="section-header center">
+          <span class="eyebrow">One Shared Engine · Two High-Impact Modes</span>
+          <h2>Built for Direct Basket Checkout & High-Ticket Lead Sales</h2>
+          <p>Merchants can activate Commerce Mode, Lead Mode, or both on the exact same WhatsApp Business number.</p>
+        </div>
+
+        <div class="dual-mode-grid">
+          <!-- Commerce Mode Card -->
+          <div class="mode-card">
+            <div class="mode-header">
+              <span class="mode-pill pill-emerald">Commerce Mode (Modules A–H)</span>
+              <h3>From Inquiry to Verified Payment</h3>
+              <p>For Kirana stores, restaurants, D2C brands, pharmacies, and wholesale distributors.</p>
+            </div>
+            <ul class="check-list">
+              <li>
+                <strong>WhatsApp Native Flows & Catalogs:</strong> Interactive product cards, delivery slot pickers, and address forms rendered natively inside WhatsApp.
+              </li>
+              <li>
+                <strong>Live Stock Reservation:</strong> Reserves inventory at checkout and revalidates before order creation so two buyers never claim the last unit.
+              </li>
+              <li>
+                <strong>RTO Shield Risk Scoring:</strong> Flags high-risk COD orders (incomplete addresses, repeat cancellations) and nudges prepaid UPI incentives.
+              </li>
+              <li>
+                <strong>Probable Cart Abandonment Recovery:</strong> Detects whether a buyer dropped due to price or delivery fees and sends compliant template follow-ups.
+              </li>
+            </ul>
+          </div>
+
+          <!-- Lead Conversion Mode Card -->
+          <div class="mode-card">
+            <div class="mode-header">
+              <span class="mode-pill pill-amber">Lead Mode (Module I)</span>
+              <h3>From Enquiry to Booked Appointment</h3>
+              <p>For Real Estate, Education, Insurance, Auto Dealers, and Travel Agencies.</p>
+            </div>
+            <ul class="check-list">
+              <li>
+                <strong>Instant 24/7 Lead Qualification:</strong> Replies in seconds in the lead's language, asking one short question at a time for budget, need, and timeline.
+              </li>
+              <li>
+                <strong>Google Calendar Slot Booking:</strong> Checks merchant availability, proposes 2–3 free slots via interactive buttons, and prevents double-booking.
+              </li>
+              <li>
+                <strong>Automated Stop-Aware Follow-ups:</strong> Timed follow-up sequences (2h, 1d, 3d, 7d) that halt the instant a lead replies, books, or opts out.
+              </li>
+              <li>
+                <strong>Regulated Vertical Guardrails:</strong> Strict forbidden-claim rules ensure insurance or real estate bots never promise returns or unapproved policies.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 5: COMPLETE CUSTOMER JOURNEY STEPPER -->
+    <section id="demo-flow" class="section">
+      <div class="container">
+        <div class="section-header center">
+          <span class="eyebrow">End-to-End Execution Flow</span>
+          <h2>How an order completes without opening a website</h2>
+        </div>
+
+        <div class="journey-track">
+          <div class="journey-step">
+            <div class="step-num">1</div>
+            <h4>Multimodal Input</h4>
+            <p>Customer sends a voice note, photo, or casual text on WhatsApp.</p>
+          </div>
+          <div class="journey-connector" aria-hidden="true"></div>
+          <div class="journey-step">
+            <div class="step-num">2</div>
+            <h4>Orchestrator & Tools</h4>
+            <p>AI transcribes/extracts intent and queries live catalog & stock APIs.</p>
+          </div>
+          <div class="journey-connector" aria-hidden="true"></div>
+          <div class="journey-step">
+            <div class="step-num">3</div>
+            <h4>WhatsApp Flow Review</h4>
+            <p>Customer confirms items, delivery slot, and address inside WhatsApp.</p>
+          </div>
+          <div class="journey-connector" aria-hidden="true"></div>
+          <div class="journey-step">
+            <div class="step-num">4</div>
+            <h4>Webhook Payment</h4>
+            <p>Paid via WhatsApp Pay, UPI link, or Razorpay; verified via webhook.</p>
+          </div>
+          <div class="journey-connector" aria-hidden="true"></div>
+          <div class="journey-step">
+            <div class="step-num">5</div>
+            <h4>Live Tracking & CRM</h4>
+            <p>Order syncs to merchant dashboard with automated dispatch alerts.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 6: AGENTIC AI & DETERMINISTIC ARCHITECTURE -->
+    <section id="architecture" class="section section-dark-forest">
+      <div class="container">
+        <div class="section-header center light">
+          <span class="eyebrow eyebrow-light">System Architecture & Golden Guardrails</span>
+          <h2>AI understands intent. Deterministic code handles money.</h2>
+          <p>Instead of one monolithic LLM that hallucinates prices or stock, a Central Orchestrator routes tasks to specialized agents backed by strict transactional APIs.</p>
+        </div>
+
+        <!-- Architecture Diagram Layout -->
+        <div class="arch-diagram">
+          <!-- Layer 1 -->
+          <div class="arch-tier">
+            <div class="tier-label">01 · Channel & Understanding Layer</div>
+            <div class="tier-nodes">
+              <div class="arch-node">WhatsApp Cloud API & Webhooks</div>
+              <div class="arch-node">Multilingual Speech-to-Text</div>
+              <div class="arch-node">Vision OCR & Visual Matcher</div>
+              <div class="arch-node">24-Hr Window & Template Guard</div>
+            </div>
+          </div>
+
+          <div class="arch-flow-arrow">
+            <span>Verified Tenant Context + Deduplicated Message ID</span>
+          </div>
+
+          <!-- Layer 2 -->
+          <div class="arch-tier tier-highlight">
+            <div class="tier-label">02 · Central AI Orchestrator (LangGraph / Controlled Tool-Calling)</div>
+            <div class="agent-grid">
+              <div class="agent-chip">Shopping Agent</div>
+              <div class="agent-chip">Catalog Agent</div>
+              <div class="agent-chip">Inventory Agent</div>
+              <div class="agent-chip">Order Agent</div>
+              <div class="agent-chip">Payment Agent</div>
+              <div class="agent-chip">Lead Qualifier</div>
+              <div class="agent-chip">Recovery Agent</div>
+              <div class="agent-chip">RTO Risk Agent</div>
+            </div>
+          </div>
+
+          <div class="arch-flow-arrow">
+            <span>Registered Deterministic Tools Only (Zero Direct DB Access)</span>
+          </div>
+
+          <!-- Layer 3 -->
+          <div class="arch-tier">
+            <div class="tier-label">03 · Multi-Tenant Backend & Async Automation</div>
+            <div class="tier-nodes">
+              <div class="arch-node node-solid">PostgreSQL + Supabase RLS (Tenant Isolated)</div>
+              <div class="arch-node node-solid">Transactional Cart & Stock Lock</div>
+              <div class="arch-node node-solid">Razorpay / UPI Webhook Verifier</div>
+              <div class="arch-node node-solid">n8n Async Workflows (Alerts & Follow-ups)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Responsibility Split Table -->
+        <div class="split-comparison">
+          <div class="split-col">
+            <h4>What AI Agents Do</h4>
+            <ul>
+              <li>Interpret informal Hinglish voice notes & text</li>
+              <li>Extract items from handwritten list photos</li>
+              <li>Suggest in-stock product alternatives</li>
+              <li>Qualify leads one question at a time</li>
+              <li>Summarize escalations for human staff</li>
+            </ul>
+          </div>
+          <div class="split-col split-backend">
+            <h4>What Deterministic Backend Enforces</h4>
+            <ul>
+              <li>Fetch exact SKU prices (stored in integer paise)</li>
+              <li>Lock stock & prevent double-selling last units</li>
+              <li>Require explicit customer confirmation tokens</li>
+              <li>Mark orders paid <em>only</em> via payment webhooks</li>
+              <li>Enforce Row-Level Security across all tenants</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 7: MERCHANT BACK-OFFICE DASHBOARD PREVIEW -->
+    <section id="dashboard" class="section">
+      <div class="container">
+        <div class="section-header center">
+          <span class="eyebrow">Module G · Merchant Operations & Human-in-the-Loop CRM</span>
+          <h2>Complete business visibility without reading 500 chats</h2>
+          <p>AI handles routine orders automatically and hands off complex queries, warranty questions, or high-RTO alerts to your team with a 1-click summary.</p>
+        </div>
+
+        <div class="dashboard-window">
+          <div class="dash-topbar">
+            <div class="window-dots">
+              <span></span><span></span><span></span>
+            </div>
+            <div class="dash-url">app.vyapaar.ai / merchant / overview</div>
+            <div class="dash-tenant-pill">Tenant: FreshBasket Retail (WABA Connected)</div>
+          </div>
+
+          <div class="dash-body">
+            <!-- Sidebar -->
+            <aside class="dash-sidebar">
+              <div class="dash-nav-item active">Overview</div>
+              <div class="dash-nav-item">Conversations <span class="badge-count">3</span></div>
+              <div class="dash-nav-item">Orders & RTO Shield</div>
+              <div class="dash-nav-item">Catalog & Stock</div>
+              <div class="dash-nav-item">Customers & My Usual</div>
+              <div class="dash-nav-item">Lead Pipeline</div>
+            </aside>
+
+            <!-- Main Content -->
+            <div class="dash-content">
+              <!-- KPI Row -->
+              <div class="kpi-row">
+                <div class="kpi-card">
+                  <span class="kpi-label">Chat-to-Order Conversion</span>
+                  <strong class="kpi-val">34.8%</strong>
+                  <span class="kpi-delta positive">+12.4% vs manual chat</span>
+                </div>
+                <div class="kpi-card">
+                  <span class="kpi-label">AI Resolution Rate</span>
+                  <strong class="kpi-val">88.2%</strong>
+                  <span class="kpi-delta">Avg response: 1.8 sec</span>
+                </div>
+                <div class="kpi-card">
+                  <span class="kpi-label">Abandoned Carts Recovered</span>
+                  <strong class="kpi-val">₹42,600</strong>
+                  <span class="kpi-delta positive">29 orders saved this week</span>
+                </div>
+                <div class="kpi-card">
+                  <span class="kpi-label">RTO COD Risk Flagged</span>
+                  <strong class="kpi-val">6 Orders</strong>
+                  <span class="kpi-delta warn">Address confirmation sent</span>
+                </div>
+              </div>
+
+              <!-- Human Handover & RTO Alert Preview -->
+              <div class="dash-alerts-grid">
+                <div class="alert-box">
+                  <div class="alert-top">
+                    <span class="alert-tag tag-escalation">Human Escalation · Needs Attention</span>
+                    <span class="alert-time">2 mins ago</span>
+                  </div>
+                  <h4>Customer #1042 — Mixer Grinder Warranty Query</h4>
+                  <p><strong>AI Summary:</strong> Customer selected Prestige 750W Mixer Grinder but asked whether motor warranty covers commercial café use. Catalog lacks commercial warranty terms.</p>
+                  <div class="alert-actions">
+                    <button type="button" class="btn btn-primary btn-sm">Take Over Chat</button>
+                    <button type="button" class="btn btn-ghost btn-sm">View Full Transcript</button>
+                  </div>
+                </div>
+
+                <div class="alert-box">
+                  <div class="alert-top">
+                    <span class="alert-tag tag-rto">RTO Shield · Medium Risk (62/100)</span>
+                    <span class="alert-time">Order #ORD-8891</span>
+                  </div>
+                  <h4>First-Time COD Order · ₹2,450</h4>
+                  <p><strong>Signals:</strong> First-time COD buyer + incomplete landmark in address. Recommended action triggered: automated WhatsApp address confirmation & ₹50 UPI prepaid nudge.</p>
+                  <div class="alert-actions">
+                    <button type="button" class="btn btn-outline btn-sm">Approve Dispatch</button>
+                    <button type="button" class="btn btn-ghost btn-sm">Request Prepaid</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 8: MULTI-INDUSTRY VERTICALS -->
+    <section class="section section-tinted">
+      <div class="container">
+        <div class="section-header center">
+          <span class="eyebrow">Configurable Industry Workflows</span>
+          <h2>One platform tailored to how each business sells</h2>
+        </div>
+
+        <div class="verticals-grid">
+          <div class="vertical-card">
+            <h4>Kirana & Supermarkets</h4>
+            <p>Voice grocery baskets, handwritten list OCR, "My Usual" 1-tap reorders, and live stock substitution.</p>
+          </div>
+          <div class="vertical-card">
+            <h4>Restaurants & Cloud Kitchens</h4>
+            <p>Conversational meal customization, spice/portion notes, repeat meal suggestions, and instant UPI links.</p>
+          </div>
+          <div class="vertical-card">
+            <h4>Pharmacies (With Guardrails)</h4>
+            <p>Stock availability checks, refill reminders, and mandatory licensed pharmacist escalation for prescriptions.</p>
+          </div>
+          <div class="vertical-card">
+            <h4>D2C & Local Retail</h4>
+            <p>Visual product search from camera photos, side-by-side comparisons, and smart cart recovery.</p>
+          </div>
+          <div class="vertical-card">
+            <h4>Real Estate & Auto Dealers</h4>
+            <p>Lead Mode qualification, RERA/offer sharing, and automated site-visit or test-drive calendar booking.</p>
+          </div>
+          <div class="vertical-card">
+            <h4>Education & Insurance</h4>
+            <p>24/7 counsellor slot scheduling, strict compliance guardrails, and CRM sync with HubSpot or Zoho.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 9: TRANSPARENT SAAS PRICING -->
+    <section id="pricing" class="section">
+      <div class="container">
+        <div class="section-header center">
+          <span class="eyebrow">SaaS Plans for Growing Businesses</span>
+          <h2>Simple monthly plans with transparent usage</h2>
+          <p>Start with a CSV catalog upload and Meta Embedded Signup in minutes. WhatsApp Cloud API conversation fees billed transparently at actuals above plan allowances.</p>
+        </div>
+
+        <div class="pricing-grid">
+          <div class="price-card">
+            <div class="plan-name">Starter</div>
+            <div class="plan-price">₹999<span>/month</span></div>
+            <p class="plan-desc">For single-store retailers & local businesses starting WhatsApp commerce.</p>
+            <ul class="plan-features">
+              <li>Natural-language AI Shopping Assistant</li>
+              <li>CSV / Excel Product Catalog Sync</li>
+              <li>Conversational Cart & UPI Payment Links</li>
+              <li>Basic Merchant Order Dashboard</li>
+            </ul>
+            <a href="#demo-flow" class="btn btn-outline btn-block">Start with Starter</a>
+          </div>
+
+          <div class="price-card price-featured">
+            <div class="popular-ribbon">Most Popular</div>
+            <div class="plan-name">Growth</div>
+            <div class="plan-price">₹2,999<span>/month</span></div>
+            <p class="plan-desc">Full multimodal voice & photo ordering with retention and lead automation.</p>
+            <ul class="plan-features">
+              <li>Audio-to-Order (Multilingual Voice STT)</li>
+              <li>Photo-to-Order (List OCR & Visual Search)</li>
+              <li>"My Usual" & "My Wishlist" Memory</li>
+              <li>Smart Cart Abandonment Recovery</li>
+              <li>Lead Mode Qualification & Google Calendar</li>
+            </ul>
+            <button type="button" class="btn btn-primary btn-block" onclick="startOnboarding()">Launch Growth Plan →</button>
+          </div>
+
+          <div class="price-card">
+            <div class="plan-name">Business</div>
+            <div class="plan-price">₹6,999+<span>/month</span></div>
+            <p class="plan-desc">For multi-branch brands, distributors, and high-volume sales teams.</p>
+            <ul class="plan-features">
+              <li>RTO Shield COD Risk Scoring Engine</li>
+              <li>Multi-Agent Human CRM & Seat Roles</li>
+              <li>Custom POS, ERP, HubSpot & Zoho Sync</li>
+              <li>Dedicated Meta Tech Provider Onboarding</li>
+            </ul>
+            <button type="button" class="btn btn-outline btn-block" onclick="startOnboarding()">Talk to Solutions Team →</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+
+    <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <span class="brand-name light">Vyapaar</span>
+        <p>AI-Powered Conversational Commerce & Lead Automation Infrastructure built on the official WhatsApp Business Platform.</p>
+      </div>
+      <div class="footer-links">
+        <div>
+          <h5>Platform</h5>
+          <a href="#multimodal">Multimodal AI</a>
+          <a href="#platform-modes">Commerce & Lead Modes</a>
+          <a href="#architecture">Agent Architecture</a>
+        </div>
+        <div>
+          <h5>Compliance & Trust</h5>
+          <a href="#architecture">Meta Cloud API Policy</a>
+          <a href="#architecture">DPDP Data Isolation</a>
+          <a href="#dashboard">Human-in-the-Loop CRM</a>
+        </div>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <span>© 2026 Vyapaar Technologies. Built for accessible conversational commerce.</span>
+      <span>Powered by WhatsApp Cloud API · Gemini Multimodal · n8n</span>
+    </div>
+  </footer>
+  </div><!-- /#view-landing -->
+
+  <!-- =========================================================================
+       MASTER VIEW 2: 5-STEP ONBOARDING & OPERATIONS PLATFORM (OPENED BY GET STARTED)
+       ========================================================================= -->
+  <div id="view-onboarding" class="master-view" style="display:none;">
+
+    <nav class="step-tracker-bar" aria-label="Onboarding Progress">
+    <div class="container step-tracker-inner">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button type="button" class="btn-back-landing" onclick="returnToLanding()" title="Return to Main Landing Page">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          <span>Back to Home</span>
+        </button>
+        <a href="#" class="step-tracker-brand" onclick="goToStep(1); return false;">
+          <span class="step-brand-logo">V</span>
+          <span class="step-brand-name">Vyapaar</span>
+        </a>
+      </div>
+
+      <div class="step-dots-list">
+        <div class="step-dot-item active" id="dot-step-1" onclick="goToStep(1)">
+          <span class="step-dot-num">1</span>
+          <span>Business Type</span>
+        </div>
+        <span class="step-dot-arrow">→</span>
+        <div class="step-dot-item" id="dot-step-2" onclick="goToStep(2)">
+          <span class="step-dot-num">2</span>
+          <span>Sign In / Up</span>
+        </div>
+        <span class="step-dot-arrow">→</span>
+        <div class="step-dot-item" id="dot-step-3" onclick="goToStep(3)">
+          <span class="step-dot-num">3</span>
+          <span>Process Flow</span>
+        </div>
+        <span class="step-dot-arrow">→</span>
+        <div class="step-dot-item" id="dot-step-4" onclick="goToStep(4)">
+          <span class="step-dot-num">4</span>
+          <span>Business Details</span>
+        </div>
+        <span class="step-dot-arrow">→</span>
+        <div class="step-dot-item" id="dot-step-5" onclick="goToStep(5)">
+          <span class="step-dot-num">5</span>
+          <span>Product Catalogue</span>
+        </div>
+      </div>
+
+      <div class="step-pill-indicator">
+        <span style="color:var(--text-muted);">Configuring:</span>
+        <strong id="active-role-pill-text" style="color:var(--bg-forest);">Retailer</strong>
+      </div>
+    </div>
+  </nav>
+
+  <!-- App Views Container -->
+  <div id="app-views-container">
+
+    <!-- ==========================================================================
+         STEP 1: BUSINESS OCCUPATION SELECTION GATEWAY (FIRST PAGE)
+         ========================================================================== -->
+
+      <section id="view-step1" class="app-view view-active occupation-hero">
+      <div class="container">
+        <div class="occupation-header">
+          <div class="occupation-badge">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 11H9v-2h2v2zm0-4H9V5h2v4z"/></svg>
+            <span>Step 1 of 5 · Commerce Personalization Engine</span>
+          </div>
+          <h1 class="occupation-title">
+            How does your business sell to customers?
+          </h1>
+          <p class="occupation-desc">
+            Select your industry model. Vyapaar configures your AI shopping assistant, order extraction models, deterministic inventory rules, and WhatsApp flows to fit how your customers order.
+          </p>
+        </div>
+
+        <!-- 6 Occupation Selection Cards -->
+        <div class="occupation-grid" role="radiogroup" aria-label="Select your business occupation">
+          
+          <!-- 1. Retailer -->
+          <div class="occupation-card selected" id="card-retailer" onclick="selectOccupation('retailer')" role="radio" aria-checked="true" tabindex="0">
+            <div class="card-select-tick">
+              <svg width="14" height="14"><use href="#icon-check"/></svg>
+            </div>
+            <div>
+              <div class="occ-card-header">
+                <div class="occ-icon-wrapper occ-icon-retail">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+                    <line x1="3" y1="6" x2="21" y2="6"/>
+                    <path d="M16 10a4 4 0 0 1-8 0"/>
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="occ-card-title">Retailer</h3>
+                  <div class="occ-card-subtitle">Kirana & Supermarkets</div>
+                </div>
+              </div>
+              <p class="occ-card-text">
+                Accept voice notes in Hinglish, handwritten grocery list photos, and 1-tap "My Usual" monthly reorders with live stock sync.
+              </p>
+            </div>
+            <div class="occ-feature-tags">
+              <span class="occ-tag">Hinglish Voice STT</span>
+              <span class="occ-tag">Handwritten List OCR</span>
+              <span class="occ-tag">UPI 1-Click Pay</span>
+            </div>
+          </div>
+
+          <!-- 2. Restaurant Owner -->
+          <div class="occupation-card" id="card-restaurant" onclick="selectOccupation('restaurant')" role="radio" aria-checked="false" tabindex="0">
+            <div class="card-select-tick">
+              <svg width="14" height="14"><use href="#icon-check"/></svg>
+            </div>
+            <div>
+              <div class="occ-card-header">
+                <div class="occ-icon-wrapper occ-icon-restaurant">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
+                    <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
+                    <line x1="6" y1="2" x2="6" y2="5"/>
+                    <line x1="10" y1="2" x2="10" y2="5"/>
+                    <line x1="14" y1="2" x2="14" y2="5"/>
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="occ-card-title">Restaurant Owner</h3>
+                  <div class="occ-card-subtitle">Cafés & Cloud Kitchens</div>
+                </div>
+              </div>
+              <p class="occ-card-text">
+                Send visual WhatsApp menus, handle customized spice/portion requests, print kitchen tickets (KOT), and take table reservations.
+              </p>
+            </div>
+            <div class="occ-feature-tags">
+              <span class="occ-tag">Visual Menu Cards</span>
+              <span class="occ-tag">Add-on Customizer</span>
+              <span class="occ-tag">Kitchen KOT Bot</span>
+            </div>
+          </div>
+
+          <!-- 3. D2C Brand -->
+          <div class="occupation-card" id="card-d2c" onclick="selectOccupation('d2c')" role="radio" aria-checked="false" tabindex="0">
+            <div class="card-select-tick">
+              <svg width="14" height="14"><use href="#icon-check"/></svg>
+            </div>
+            <div>
+              <div class="occ-card-header">
+                <div class="occ-icon-wrapper occ-icon-d2c">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="occ-card-title">D2C Brand</h3>
+                  <div class="occ-card-subtitle">Apparel & Lifestyle</div>
+                </div>
+              </div>
+              <p class="occ-card-text">
+                Visual product match from camera photos, abandoned cart recovery, RTO COD risk scoring, and real-time shipping notifications.
+              </p>
+            </div>
+            <div class="occ-feature-tags">
+              <span class="occ-tag">Camera Visual Search</span>
+              <span class="occ-tag">RTO Shield 0-100</span>
+              <span class="occ-tag">Cart Recovery</span>
+            </div>
+          </div>
+
+          <!-- 4. Distributor -->
+          <div class="occupation-card" id="card-distributor" onclick="selectOccupation('distributor')" role="radio" aria-checked="false" tabindex="0">
+            <div class="card-select-tick">
+              <svg width="14" height="14"><use href="#icon-check"/></svg>
+            </div>
+            <div>
+              <div class="occ-card-header">
+                <div class="occ-icon-wrapper occ-icon-distributor">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="1" y="3" width="15" height="13"/>
+                    <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
+                    <circle cx="5.5" cy="18.5" r="2.5"/>
+                    <circle cx="18.5" cy="18.5" r="2.5"/>
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="occ-card-title">Distributor</h3>
+                  <div class="occ-card-subtitle">Wholesale & B2B Supply</div>
+                </div>
+              </div>
+              <p class="occ-card-text">
+                Accept bulk carton & pallet orders, offer tiered dealer pricing, enforce credit limits, and send automated GST e-invoices.
+              </p>
+            </div>
+            <div class="occ-feature-tags">
+              <span class="occ-tag">Bulk SKU Matrix</span>
+              <span class="occ-tag">Tiered B2B Pricing</span>
+              <span class="occ-tag">Credit Ledger Sync</span>
+            </div>
+          </div>
+
+          <!-- 5. Pharmacy -->
+          <div class="occupation-card" id="card-pharmacy" onclick="selectOccupation('pharmacy')" role="radio" aria-checked="false" tabindex="0">
+            <div class="card-select-tick">
+              <svg width="14" height="14"><use href="#icon-check"/></svg>
+            </div>
+            <div>
+              <div class="occ-card-header">
+                <div class="occ-icon-wrapper occ-icon-pharmacy">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+                    <path d="M12 9v6"/>
+                    <path d="M9 12h6"/>
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="occ-card-title">Pharmacy</h3>
+                  <div class="occ-card-subtitle">Chemists & Healthcare</div>
+                </div>
+              </div>
+              <p class="occ-card-text">
+                Prescription photo OCR, Schedule H drug safeguards with mandatory pharmacist handover, and recurring monthly refill reminders.
+              </p>
+            </div>
+            <div class="occ-feature-tags">
+              <span class="occ-tag">Prescription OCR</span>
+              <span class="occ-tag">Pharmacist Escalation</span>
+              <span class="occ-tag">Refill Reminder</span>
+            </div>
+          </div>
+
+          <!-- 6. Local Business -->
+          <div class="occupation-card" id="card-local" onclick="selectOccupation('local_business')" role="radio" aria-checked="false" tabindex="0">
+            <div class="card-select-tick">
+              <svg width="14" height="14"><use href="#icon-check"/></svg>
+            </div>
+            <div>
+              <div class="occ-card-header">
+                <div class="occ-icon-wrapper occ-icon-local">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="occ-card-title">Local Business</h3>
+                  <div class="occ-card-subtitle">Salons, Repairs & Services</div>
+                </div>
+              </div>
+              <p class="occ-card-text">
+                Interactive appointment slot picker, Google Calendar sync, advance deposit collection via UPI, and automated visit reminders.
+              </p>
+            </div>
+            <div class="occ-feature-tags">
+              <span class="occ-tag">Calendar Slot Picker</span>
+              <span class="occ-tag">Advance UPI Token</span>
+              <span class="occ-tag">Automated Reminder</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Dynamic Live Spotlight / Industry Preview Box -->
+        <div class="occupation-spotlight" id="occupation-spotlight">
+          <div class="spotlight-info">
+            <span class="eyebrow" id="spotlight-eyebrow" style="color:var(--accent-emerald-dark); font-weight:700; text-transform:uppercase; letter-spacing:0.05em; font-size:0.8rem;">
+              Customized Architecture For Retailers
+            </span>
+            <h3 id="spotlight-title">Voice Grocery Baskets & Handwritten OCR</h3>
+            <p id="spotlight-desc">
+              Your shoppers never have to search a website or remember exact English spellings. They send a casual voice note or photo of their handwritten paper slip on WhatsApp, and Vyapaar creates a verified cart with live stock deduction.
+            </p>
+            <ul class="spotlight-highlights-list" id="spotlight-highlights">
+              <li>
+                <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor"><use href="#icon-check"/></svg>
+                <span>Extracts multiple SKUs, weights & brand substitutions</span>
+              </li>
+              <li>
+                <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor"><use href="#icon-check"/></svg>
+                <span>1-Tap "My Usual" monthly grocery reorder recall</span>
+              </li>
+              <li>
+                <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor"><use href="#icon-check"/></svg>
+                <span>Zero-fee WhatsApp UPI instant payment link generation</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="spotlight-demo-preview">
+            <div class="demo-preview-header">
+              <span class="demo-header-label" id="preview-header-label">WhatsApp Live Simulation · Retail Kirana</span>
+              <span class="demo-header-status">
+                <span class="demo-pulse-dot"></span>
+                <span>AI Active</span>
+              </span>
+            </div>
+            <div class="demo-bubble-user" id="preview-user-bubble">
+              "Bhaiya, do kilo basmati chawal, 1 pack Tata Namak aur Amul butter bhej do shaam tak."
+            </div>
+            <div class="demo-bubble-ai" id="preview-ai-bubble">
+              Namaste! Added <strong>India Gate Basmati (2kg)</strong>, <strong>Tata Salt (1kg)</strong>, and <strong>Amul Butter (100g)</strong> to your basket. Total is <strong>₹345</strong>. Delivery by 5:30 PM. Click below to pay via UPI.
+            </div>
+          </div>
+        </div>
+
+        <!-- Occupation Action Bar -->
+        <div class="occupation-actions-bar">
+          <div class="occ-action-meta">
+            <span class="meta-selected-label">Selected Business Model:</span>
+            <span class="meta-selected-badge" id="action-bar-selected-name">Retailer</span>
+          </div>
+          <button type="button" class="btn btn-primary btn-lg occ-btn-continue" onclick="continueFromOccupation()">
+            <span>Continue to Sign Up</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         STEP 2: LOGIN / SIGN UP VIEW
+         ========================================================================== -->
+
+      <section id="view-step2" class="app-view auth-hero">
+      <div class="container auth-container">
+        
+        <div class="auth-header">
+          <div class="auth-role-pill">
+            <svg width="15" height="15" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 11H9v-2h2v2zm0-4H9V5h2v4z"/></svg>
+            <span>Configuring for: <strong id="auth-role-name">Retailer</strong></span>
+            <span class="auth-role-change" onclick="goToStep(1)">(Change)</span>
+          </div>
+          <h1 class="auth-title">Welcome to your WhatsApp Sales Terminal</h1>
+          <p class="auth-desc">Sign up or login to activate your AI workflows, connect your WhatsApp number, and sync live inventory.</p>
+        </div>
+
+        <div class="auth-card">
+          <!-- Segmented Tab Switcher -->
+          <div class="auth-tabs" role="tablist">
+            <button type="button" class="auth-tab-btn active" id="tab-signup" onclick="setAuthTab('signup')" role="tab" aria-selected="true">
+              Create Merchant Account
+            </button>
+            <button type="button" class="auth-tab-btn" id="tab-signin" onclick="setAuthTab('signin')" role="tab" aria-selected="false">
+              Sign In
+            </button>
+          </div>
+
+          <!-- Sign Up Form -->
+          <form id="auth-form-signup" class="auth-form" onsubmit="handleAuthSubmit(event, 'signup')">
+            <div class="form-field">
+              <label for="signup-name">Your Full Name</label>
+              <input type="text" id="signup-name" class="form-input" placeholder="e.g. Rahul Sharma" required />
+            </div>
+
+            <div class="form-field">
+              <label for="signup-phone">WhatsApp Business Mobile Number</label>
+              <div class="phone-input-group">
+                <span class="phone-prefix">+91</span>
+                <input type="tel" id="signup-phone" class="form-input" placeholder="9876543210" pattern="[0-9]{10}" maxlength="10" required />
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label for="signup-email">Business Email Address</label>
+              <input type="email" id="signup-email" class="form-input" placeholder="rahul@freshbasket.in" required />
+            </div>
+
+            <div class="form-field">
+              <label for="signup-password">Account Password</label>
+              <input type="password" id="signup-password" class="form-input" placeholder="At least 6 characters" minlength="6" required />
+            </div>
+
+            <label class="form-checkbox-row">
+              <input type="checkbox" id="signup-alerts" checked />
+              <span>Enable instant WhatsApp OTP login, real-time order alerts & human takeover notifications</span>
+            </label>
+
+            <div class="auth-security-note">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <span><strong>Tenant Isolation (Supabase RLS)</strong>: Your product catalog, customer lists, and financial logs are strictly private and encrypted under India DPDP compliance.</span>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top:8px;">
+              <span>Create Account & Configure Process Flow</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </button>
+          </form>
+
+          <!-- Sign In Form -->
+          <form id="auth-form-signin" class="auth-form" style="display:none;" onsubmit="handleAuthSubmit(event, 'signin')">
+            <div class="form-field">
+              <label for="signin-identifier">WhatsApp Mobile Number or Email</label>
+              <input type="text" id="signin-identifier" class="form-input" placeholder="Enter your registered phone or email" required />
+            </div>
+
+            <div class="form-field">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <label for="signin-password">Password</label>
+                <a href="#" onclick="alert('Password reset link sent to your registered WhatsApp/Email.'); return false;" style="font-size:0.8rem; color:var(--accent-emerald-dark); text-decoration:underline;">Forgot?</a>
+              </div>
+              <input type="password" id="signin-password" class="form-input" placeholder="••••••••" required />
+            </div>
+
+            <label class="form-checkbox-row">
+              <input type="checkbox" checked />
+              <span>Keep this device remembered for 30 days</span>
+            </label>
+
+            <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top:8px;">
+              <span>Sign In to Merchant Terminal</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </button>
+          </form>
+
+          <!-- Instant Demo Bypass Button -->
+          <div class="auth-demo-divider">
+            <span>Or explore without typing credentials</span>
+          </div>
+
+          <button type="button" class="btn-demo-instant" onclick="instantDemoLogin()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            <span>Instant 1-Click Demo Login (Preloaded Data)</span>
+          </button>
+
+          <div class="auth-card-footer">
+            <span>Need to change business model? <a href="#" onclick="goToStep(1); return false;">Go back to Step 1</a></span>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         STEP 3: HOME PAGE & PERSONALIZED PROCESS FLOW (PLACEHOLDER CONTAINER)
+         ========================================================================== -->
+
+      <!-- ==========================================================================
+         STEP 3: PERSONALIZED PROCESS FLOW ARCHITECTURE BANNER & SELECTOR
+         ========================================================================== -->
+    <section id="view-step3" class="app-view">
+      <section id="process-flow-section" class="process-flow-hero">
+    <div class="container">
+      
+      <div class="flow-header-wrapper">
+        <div class="flow-header-copy">
+          <div class="flow-eyebrow-pill">
+            <svg width="15" height="15" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 11H9v-2h2v2zm0-4H9V5h2v4z"/></svg>
+            <span id="flow-eyebrow-text">Personalized Architecture for Retailers</span>
+          </div>
+          <h2 class="flow-title" id="flow-main-title">How Retail Kirana Sells on WhatsApp</h2>
+          <p class="flow-subtitle" id="flow-main-subtitle">
+            Here is your automated business workflow from customer inquiry to verified payment. Select or customize the exact processes you want active in your business.
+          </p>
+        </div>
+
+        <div class="flow-controls-box">
+          <span class="flow-active-badge">
+            <span id="flow-active-count">5</span> of 5 Active
+          </span>
+          <span style="color:var(--border-light)">|</span>
+          <button type="button" class="flow-select-all-btn" onclick="selectAllProcesses()">Select All</button>
+        </div>
+      </div>
+
+      <!-- 5 Dynamic Connected Process Stages -->
+      <div class="flow-diagram-track" id="flow-stages-container">
+        <!-- Rendered dynamically by JavaScript -->
+      </div>
+
+      <!-- Bottom Step 3 Action Bar -->
+      <div class="flow-action-card">
+        <div class="flow-action-info">
+          <div class="flow-action-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <div>
+            <div class="flow-action-title">Processes Ready for Deployment</div>
+            <div class="flow-action-sub" id="flow-action-subtext">5 automated modules active for your WhatsApp store. Next: configure your business profile & catalog.</div>
+          </div>
+        </div>
+
+        <div class="flow-btns-group">
+          <button type="button" class="btn btn-outline" onclick="returnToLanding()">← Back to Home Page</button>
+          <button type="button" class="btn btn-primary btn-lg btn-proceed-step4" onclick="proceedToStep4()">
+            <span>Save Processes & Enter Business Details (Step 4)</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+    </section>
+
+      <section id="view-step4" class="app-view biz-hero">
+      <div class="container">
+        
+        <div class="biz-header">
+          <div class="biz-eyebrow-pill">
+            <svg width="15" height="15" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 11H9v-2h2v2zm0-4H9V5h2v4z"/></svg>
+            <span>Step 4 of 5 · Storefront Identity</span>
+          </div>
+          <h1 class="biz-title">Tell us about your business</h1>
+          <p class="biz-subtitle">
+            Configure your brand identity, official WhatsApp business number, and delivery mode. Your AI assistant will greet shoppers in your store's name.
+          </p>
+        </div>
+
+        <div class="biz-split-grid">
+          
+          <!-- Left: Business Details Form -->
+          <div class="biz-form-card">
+            <form id="biz-details-form" class="biz-form" onsubmit="handleBizDetailsSubmit(event)">
+              
+              <div class="form-grid-2">
+                <div class="form-field">
+                  <label for="biz-owner-name">Owner / Manager Full Name</label>
+                  <input type="text" id="biz-owner-name" class="form-input" placeholder="e.g. Rahul Sharma" required />
+                </div>
+
+                <div class="form-field">
+                  <label for="biz-phone">WhatsApp Business Number</label>
+                  <div class="phone-input-group">
+                    <span class="phone-prefix">+91</span>
+                    <input type="tel" id="biz-phone" class="form-input" placeholder="9876543210" pattern="[0-9]{10}" maxlength="10" oninput="updateBizPreview()" required />
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-field">
+                <label for="biz-store-name">Registered Business / Store Name</label>
+                <input type="text" id="biz-store-name" class="form-input" placeholder="e.g. FreshBasket Kirana & Mart" oninput="updateBizPreview()" required />
+              </div>
+
+              <div class="form-grid-2">
+                <div class="form-field">
+                  <label for="biz-category">Primary Industry Category</label>
+                  <select id="biz-category" class="form-input" onchange="updateBizPreview()">
+                    <option value="Kirana, Grocery & Supermarket">Kirana, Grocery & Supermarket</option>
+                    <option value="Restaurant, Café & Cloud Kitchen">Restaurant, Café & Cloud Kitchen</option>
+                    <option value="Apparel, Beauty & D2C Brand">Apparel, Beauty & D2C Brand</option>
+                    <option value="Wholesale & B2B Distribution">Wholesale & B2B Distribution</option>
+                    <option value="Pharmacy, Chemist & Wellness">Pharmacy, Chemist & Wellness</option>
+                    <option value="Services, Salon & Clinic">Services, Salon & Clinic</option>
+                  </select>
+                </div>
+
+                <div class="form-field">
+                  <label for="biz-city">Operating City & Pincode</label>
+                  <div style="display:flex; gap:8px;">
+                    <input type="text" id="biz-city" class="form-input" placeholder="City (e.g. Mumbai)" oninput="updateBizPreview()" required />
+                    <input type="text" id="biz-pincode" class="form-input" placeholder="400001" pattern="[0-9]{6}" maxlength="6" style="width:110px;" required />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Delivery Model Selection -->
+              <div class="form-field">
+                <label>Customer Delivery / Service Fulfillment Model</label>
+                <div class="delivery-options-grid">
+                  <div class="delivery-radio-card active" id="del-card-local" onclick="selectDeliveryMode('local')">
+                    <input type="radio" name="delivery_mode" value="local" checked />
+                    <div class="del-card-title">🛵 Local Delivery</div>
+                    <div class="del-card-sub">In-house delivery boy / rider dispatch within 5km</div>
+                  </div>
+                  <div class="delivery-radio-card" id="del-card-pickup" onclick="selectDeliveryMode('pickup')">
+                    <input type="radio" name="delivery_mode" value="pickup" />
+                    <div class="del-card-title">🏪 Store Pickup</div>
+                    <div class="del-card-sub">Takeaway / self-pickup counter orders</div>
+                  </div>
+                  <div class="delivery-radio-card" id="del-card-courier" onclick="selectDeliveryMode('courier')">
+                    <input type="radio" name="delivery_mode" value="courier" />
+                    <div class="del-card-title">📦 Pan-India Courier</div>
+                    <div class="del-card-sub">Delhivery / BlueDart / Shiprocket shipping</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-field">
+                <label for="biz-gstin">GSTIN Number (Optional)</label>
+                <input type="text" id="biz-gstin" class="form-input" placeholder="27ABCDE1234F1Z5" style="text-transform:uppercase;" />
+              </div>
+
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                <button type="button" class="btn btn-ghost" onclick="goToStep(3)">← Back to Process Flow</button>
+                <button type="submit" class="btn btn-primary btn-lg" style="display:inline-flex; align-items:center; gap:8px;">
+                  <span>Save & Continue to Product Catalogue (Step 5)</span>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </button>
+              </div>
+
+            </form>
+          </div>
+
+          <!-- Right: Live WhatsApp Profile Preview -->
+          <div class="biz-preview-sticky">
+            <div class="biz-preview-card">
+              <div class="preview-waba-header">
+                <span class="preview-waba-header-title">WhatsApp Business Profile Preview</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+              </div>
+
+              <div class="preview-waba-body">
+                <div class="preview-store-avatar" id="preview-avatar-letter">F</div>
+                <div class="preview-store-name">
+                  <span id="preview-store-title">FreshBasket Kirana</span>
+                  <span class="preview-verified-badge" title="Official Verified WhatsApp Business Account">
+                    <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                  </span>
+                </div>
+                <div class="preview-store-phone" id="preview-store-phone-display">+91 98765 43210</div>
+
+                <div class="preview-tags-row">
+                  <span class="preview-pill" id="preview-pill-category">Kirana & Grocery</span>
+                  <span class="preview-pill" id="preview-pill-city">Mumbai</span>
+                  <span class="preview-pill pill-green">🟢 AI Active 24/7</span>
+                </div>
+
+                <div class="preview-chat-snippet">
+                  <div class="preview-bubble-welcome" id="preview-welcome-bubble">
+                    Namaste! 🙏 Welcome to <strong>FreshBasket Kirana</strong>. You can send us a voice note in Hinglish, snap a photo of your handwritten grocery list, or ask for your monthly "My Usual" basket!
+                    <span class="preview-bubble-time">Just now · Verified Business</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="preview-card-footer">
+                <span>Official Meta Cloud API</span>
+                <span style="color:#047857; font-weight:700;">Synced with Vyapaar</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         STEP 5: PRODUCT CATALOGUE SETUP VIEW
+         ========================================================================== -->
+
+      <section id="view-step5" class="app-view cat-hero">
+      <div class="container">
+        
+        <div class="cat-header">
+          <div class="cat-eyebrow-pill">
+            <svg width="15" height="15" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 11H9v-2h2v2zm0-4H9V5h2v4z"/></svg>
+            <span>Step 5 of 5 · Inventory & Catalog Setup</span>
+          </div>
+          <h1 class="cat-title">Add your product catalogue</h1>
+          <p class="cat-subtitle">
+            Choose how you want to load products into your WhatsApp store. Automatically sync from your business website URL, or build your inventory manually with 1-click industry starter presets.
+          </p>
+        </div>
+
+        <!-- 2-Pathway Choice Cards -->
+        <div class="cat-choice-grid">
+          
+          <!-- Option A: Automatic Website URL Import -->
+          <div class="cat-choice-card active" id="choice-card-url" onclick="selectCatPathway('url')">
+            <div class="choice-tick">
+              <svg width="14" height="14"><use href="#icon-check"/></svg>
+            </div>
+            <div class="choice-icon-wrap">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="2" y1="12" x2="22" y2="12"/>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+              </svg>
+            </div>
+            <span class="choice-badge">⚡ Instant AI Scraper</span>
+            <h3 class="choice-title">Automatic Website URL Import</h3>
+            <p class="choice-desc">
+              Provide your business website, Shopify, WooCommerce, or online menu link. Our AI crawler extracts titles, photos, descriptions, and prices automatically.
+            </p>
+          </div>
+
+          <!-- Option B: Manual Product Entry -->
+          <div class="cat-choice-card" id="choice-card-manual" onclick="selectCatPathway('manual')">
+            <div class="choice-tick">
+              <svg width="14" height="14"><use href="#icon-check"/></svg>
+            </div>
+            <div class="choice-icon-wrap">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            </div>
+            <span class="choice-badge badge-manual">📝 Flexible Builder</span>
+            <h3 class="choice-title">Manual Product Entry & Presets</h3>
+            <p class="choice-desc">
+              Add your SKUs one by one with custom prices, or load our pre-configured starter catalog tailored to your business model with 1 click.
+            </p>
+          </div>
+
+        </div>
+
+        <!-- Panel Box -->
+        <div class="cat-panel-box">
+          
+          <!-- PATHWAY A: AUTOMATIC WEBSITE URL SCANNER -->
+          <div id="cat-panel-url">
+            <div class="url-input-strip">
+              <div class="url-input-wrap">
+                <span class="url-prefix">https://</span>
+                <input type="text" id="input-website-url" class="form-input" placeholder="www.freshbasket.in or yourbrand.com" value="www.freshbasket.in" />
+              </div>
+              <button type="button" class="btn btn-primary btn-scrape" id="btn-run-scrape" onclick="runWebsiteScraper()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                <span>Scrape & Extract Products</span>
+              </button>
+            </div>
+
+            <!-- Empty Placeholder Prompt (Before Scrape) -->
+            <div id="scraper-placeholder-card" class="scraper-placeholder-box">
+              <div class="scraper-placeholder-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="2" y1="12" x2="22" y2="12"/>
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                </svg>
+              </div>
+              <h4>No products extracted yet</h4>
+              <p>Enter your website or online store link above and click <strong>"Scrape & Extract Products"</strong>. Vyapaar's AI crawler will discover products, photos, descriptions, and prices in real time.</p>
+            </div>
+
+            <!-- Scanner Status Terminal Simulation -->
+            <div class="scanner-status-box" id="scanner-status-box" style="display:none;">
+              <div class="scanner-top-row">
+                <div class="scanner-pill">
+                  <span class="demo-pulse-dot"></span>
+                  <span>AI Web Crawler Active</span>
+                </div>
+                <span style="font-family:var(--font-mono); font-size:0.8rem; color:#A7F3D0;" id="scanner-url-display">Target: https://www.freshbasket.in</span>
+              </div>
+              <ul class="scanner-logs-list" id="scanner-logs">
+                <li>[1/4] Handshaking with target domain & sitemap index...</li>
+              </ul>
+              <div class="scanner-progress-bar-wrap">
+                <div class="scanner-progress-bar-fill" id="scanner-progress-bar"></div>
+              </div>
+            </div>
+
+            <!-- Scraped Products Grid Container (Only shown after scraping) -->
+            <div class="scraped-products-grid" id="scraped-products-container" style="display:none;">
+              <!-- Rendered dynamically by JavaScript after scrape completes -->
+            </div>
+          </div>
+
+          <!-- PATHWAY B: MANUAL CATALOGUE BUILDER -->
+          <div id="cat-panel-manual" style="display:none;">
+            
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:12px;">
+              <div>
+                <h4 style="font-size:1.15rem; font-weight:700; color:var(--text-primary); margin-bottom:2px;">Custom Product Inventory</h4>
+                <p style="font-size:0.88rem; color:var(--text-muted);">Manage and add items available for customer orders on WhatsApp.</p>
+              </div>
+              <button type="button" class="btn btn-outline" style="font-size:0.88rem; display:inline-flex; align-items:center; gap:6px;" onclick="loadIndustryPresets()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                <span id="btn-preset-label">Load Retailer Starter Presets</span>
+              </button>
+            </div>
+
+            <!-- Add Item Form Row -->
+            <div class="manual-add-form">
+              <div class="manual-inputs-row">
+                <div class="form-field">
+                  <label for="manual-p-name">Product Name</label>
+                  <input type="text" id="manual-p-name" class="form-input" placeholder="e.g. Aashirvaad Shudh Chakki Atta 5kg" />
+                </div>
+                <div class="form-field">
+                  <label for="manual-p-price">Price (₹)</label>
+                  <input type="number" id="manual-p-price" class="form-input" placeholder="265" />
+                </div>
+                <div class="form-field">
+                  <label for="manual-p-cat">Category</label>
+                  <input type="text" id="manual-p-cat" class="form-input" placeholder="Staples & Grains" />
+                </div>
+                <div class="form-field">
+                  <label for="manual-p-image">Product Image URL</label>
+                  <input type="url" id="manual-p-image" class="form-input" placeholder="https://... image link" />
+                </div>
+                <button type="button" class="btn btn-primary" onclick="addManualProduct()" style="padding:11px 20px;">
+                  + Add Item
+                </button>
+              </div>
+            </div>
+
+            <!-- Table of Current Items -->
+            <div class="manual-table-wrap">
+              <table class="manual-table">
+                <thead>
+                  <tr>
+                    <th style="width:64px;">Photo</th>
+                    <th>Product Name</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Status</th>
+                    <th style="text-align:right;">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="manual-table-body">
+                  <!-- Rendered dynamically -->
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+
+          <!-- Bottom Step 5 Action Bar -->
+          <div class="cat-action-strip">
+            <button type="button" class="btn btn-ghost" onclick="goToStep(4)">
+              ← Back to Business Details
+            </button>
+            <button type="button" class="btn btn-primary btn-lg" onclick="launchStorefront()" style="display:inline-flex; align-items:center; gap:8px;">
+              <span>Launch WhatsApp Store & Go Live 🚀</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         CELEBRATORY STOREFRONT LAUNCH SUCCESS MODAL
+         ========================================================================== -->
+    </div><!-- /#app-views-container -->
+
+    <div class="launch-modal-overlay" id="modal-launch-success" role="dialog" aria-modal="true">
+      <div class="launch-modal-card">
+        <div class="launch-badge-sparkle">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
+        
+        <h2 class="launch-title">Your WhatsApp Store is Ready! 🎉</h2>
+        <p class="launch-desc">
+          Your product catalog, AI voice/OCR agents, and deterministic payment workflows are connected to the official Meta Cloud API.
+        </p>
+
+        <div class="launch-summary-box">
+          <div class="launch-stat-item">
+            <span>Storefront Brand</span>
+            <strong id="modal-summary-store">FreshBasket Kirana & Mart</strong>
+          </div>
+          <div class="launch-stat-item">
+            <span>WhatsApp Business No.</span>
+            <strong id="modal-summary-phone">+91 98765 43210</strong>
+          </div>
+          <div class="launch-stat-item">
+            <span>Business Model</span>
+            <strong id="modal-summary-occ">Retailer</strong>
+          </div>
+          <div class="launch-stat-item">
+            <span>Active Catalog SKUs</span>
+            <strong id="modal-summary-items">6 Items Live Synced</strong>
+          </div>
+        </div>
+
+        <div class="launch-btns-row">
+          <button type="button" class="btn btn-primary btn-lg btn-block" onclick="closeLaunchModal(); goToStep(3);">
+            Open Merchant Operations Workspace (Step 3) →
+          </button>
+          <button type="button" class="btn btn-outline btn-block" onclick="closeLaunchModal(); returnToLanding();">
+            Return to Home Page
+          </button>
+        </div>
+      </div>
+    </div>
+
+  
+
+  <!-- Application Controller Script -->
+
+  </div><!-- /#view-onboarding -->
+
+  <script>
+    const vyapaarApp = {
+      currentStep: 1,
+      selectedOccupation: 'retailer',
+      occupations: {
+        retailer: {
+          name: "Retailer",
+          subtitle: "Kirana, Supermarkets & Grocery",
+          eyebrow: "Customized Architecture For Retailers",
+          title: "Voice Grocery Baskets & Handwritten OCR",
+          desc: "Your shoppers never have to search a website or remember exact English spellings. They send a casual voice note or photo of their handwritten paper slip on WhatsApp, and Vyapaar creates a verified cart with live stock deduction.",
+          highlights: [
+            "Extracts multiple SKUs, weights & brand substitutions from Hinglish voice notes",
+            "1-Tap 'My Usual' monthly grocery reorder recall",
+            "Zero-fee WhatsApp UPI instant payment link generation"
+          ],
+          previewLabel: "WhatsApp Live Simulation · Retail Kirana",
+          userBubble: "\"Bhaiya, do kilo basmati chawal, 1 pack Tata Namak aur Amul butter bhej do shaam tak.\"",
+          aiBubble: "Namaste! Added <strong>India Gate Basmati (2kg)</strong>, <strong>Tata Salt (1kg)</strong>, and <strong>Amul Butter (100g)</strong> to your basket. Total is <strong>₹345</strong>. Delivery by 5:30 PM. Click below to pay via UPI."
+        },
+        restaurant: {
+          name: "Restaurant Owner",
+          subtitle: "Cafés, Cloud Kitchens & QSRs",
+          eyebrow: "Customized Architecture For Restaurants",
+          title: "Conversational Menus, Add-ons & Kitchen KOT",
+          desc: "Turn WhatsApp into your highest-margin direct ordering channel. Guests browse interactive dishes, customize spice levels or crusts, pay via UPI, and tickets auto-print to your kitchen line.",
+          highlights: [
+            "Interactive rich menu cards with dietary tags (Veg/Non-Veg, Jain)",
+            "Automated Kitchen Order Ticket (KOT) generation and POS sync",
+            "Table reservation slot booking with advance deposit option"
+          ],
+          previewLabel: "WhatsApp Live Simulation · Gourmet Kitchen",
+          userBubble: "\"Send 1 Paneer Tikka Pizza, extra spicy with cheese burst, and 2 Diet Cokes to flat 402.\"",
+          aiBubble: "Chef is firing your order! 🍕 <strong>Paneer Tikka Pizza (Cheese Burst, Extra Spicy)</strong> + <strong>2× Diet Coke</strong>. Total: <strong>₹520</strong>. Delivered in 28 mins. Track live via WhatsApp."
+        },
+        d2c: {
+          name: "D2C Brand",
+          subtitle: "Apparel, Beauty & Lifestyle",
+          eyebrow: "Customized Architecture For D2C Brands",
+          title: "Visual Product Match & RTO COD Shield",
+          desc: "Cut ad drop-offs by converting social ads straight into WhatsApp checkout. AI matches uploaded photos with your catalog and dynamically flags high-risk COD orders with automated prepaid discounts.",
+          highlights: [
+            "Multimodal visual search from customer screenshots & camera photos",
+            "RTO Shield (0-100 score) detects fake addresses and repeat cancellations",
+            "Contextual cart abandonment recovery sequences within 24h Meta window"
+          ],
+          previewLabel: "WhatsApp Live Simulation · D2C Fashion",
+          userBubble: "\"Hey, saw this oversized sage green linen shirt on your Instagram. Is size M in stock?\"",
+          aiBubble: "Found it! ✨ <strong>Aura Linen Oversized Shirt in Sage Green (Size M)</strong> is in stock (4 left). Use code <strong>PREPAID50</strong> for instant ₹50 off via UPI. Here is your 1-tap checkout link."
+        },
+        distributor: {
+          name: "Distributor",
+          subtitle: "Wholesale & B2B Supply",
+          eyebrow: "Customized Architecture For Distributors",
+          title: "Bulk SKU Matrix, Tiered B2B Pricing & Ledger",
+          desc: "Empower retailers and institutional buyers to order whole cartons or pallets via WhatsApp. The agent applies tiered dealer discounts, validates credit terms, and generates compliant GST invoices.",
+          highlights: [
+            "Accepts multi-line SKU carton orders and Excel/CSV PO uploads",
+            "Real-time dealer credit balance & overdue ledger alerts",
+            "Automated warehouse picking slips and dispatch truck tracking"
+          ],
+          previewLabel: "WhatsApp Live Simulation · FMCG Wholesale Supply",
+          userBubble: "\"Need 15 cartons Parle-G 100g and 8 cartons Fortune Sunflower Oil 1L. Bill to Sri Balaji Traders.\"",
+          aiBubble: "Order #PO-7821 logged for <strong>Sri Balaji Traders</strong>. 15 cartons Parle-G + 8 cartons Fortune Oil. Tier-2 wholesale rate applied: <strong>₹28,400</strong> (GST inc). Within credit limit of ₹1,00,000. Dispatch tomorrow 9 AM."
+        },
+        pharmacy: {
+          name: "Pharmacy",
+          subtitle: "Chemists & Medical Supplies",
+          eyebrow: "Customized Architecture For Pharmacies",
+          title: "Prescription OCR & Mandatory Pharmacist Handoff",
+          desc: "Patients take a photo of their doctor's prescription. AI parses medications, verifies inventory, and enforces a mandatory pharmacist digital sign-off before dispatching sensitive Schedule H drugs.",
+          highlights: [
+            "Doctor's handwriting OCR with exact generic composition lookup",
+            "Mandatory licensed pharmacist verification gate for regulated medicines",
+            "Automated monthly chronic medication refill reminders"
+          ],
+          previewLabel: "WhatsApp Live Simulation · Partner Pharmacy",
+          userBubble: "\"Attached prescription for diabetes and BP medicines for 1 month refill.\"",
+          aiBubble: "Prescription verified by <strong>Licensed Pharmacist Rahul (Reg #4912)</strong>. <strong>Metformin 500mg (60 tabs)</strong> + <strong>Telmisartan 40mg (30 tabs)</strong> reserved in temperature-safe packaging. Delivery within 2 hours. Pay ₹410 via UPI."
+        },
+        local_business: {
+          name: "Local Business",
+          subtitle: "Salons, Repairs, Clinics & Services",
+          eyebrow: "Customized Architecture For Local Businesses",
+          title: "24/7 Appointment Booking & Advance Token UPI",
+          desc: "Stop playing phone tag. Customers pick convenient time slots directly inside WhatsApp, sync to your Google or Outlook calendar, pay an advance token to stop no-shows, and get friendly reminders.",
+          highlights: [
+            "Interactive WhatsApp Flow calendar slot picker with real-time sync",
+            "Prevents no-shows with advance token payment requirement",
+            "Automated visit reminder 2 hours prior with directions link"
+          ],
+          previewLabel: "WhatsApp Live Simulation · StyleStudio Salon & Spa",
+          userBubble: "\"Do you have an open slot for a haircut and beard trim this Saturday afternoon?\"",
+          aiBubble: "Yes! ✂️ We have <strong>Saturday 2:30 PM</strong> and <strong>4:15 PM</strong> with Senior Stylist Rohan. Tap below to confirm and reserve with a ₹100 advance deposit (deducted from your final bill)."
+        }
+      },
+      pipelines: {
+        retailer: {
+          title: "How Retail Kirana Sells on WhatsApp",
+          subtitle: "Turn Hinglish voice notes and handwritten slips into verified shopping carts with real-time stock locks.",
+          stages: [
+            { id: "ret-1", stageNum: "Stage 01", tag: "Voice Ingestion", title: "Multilingual Voice STT", desc: "Transcribes Hinglish & regional dialect voice notes into parsed grocery items & units.", active: true },
+            { id: "ret-2", stageNum: "Stage 02", tag: "List Vision", title: "Handwritten Paper OCR", desc: "Extracts multi-item paper grocery lists and fuzzy-matches against your store catalog.", active: true },
+            { id: "ret-3", stageNum: "Stage 03", tag: "Catalog & Logic", title: "Kirana Stock Sync & 'My Usual'", desc: "Locks inventory paise prices deterministically and auto-recalls previous customer baskets.", active: true },
+            { id: "ret-4", stageNum: "Stage 04", tag: "Payment", title: "Zero-Fee UPI Link & Pay", desc: "Generates 1-click WhatsApp Pay and dynamic UPI links, marking orders paid strictly via webhook.", active: true },
+            { id: "ret-5", stageNum: "Stage 05", tag: "Dispatch & CRM", title: "Local Delivery Dispatch & RTO", desc: "Routes dispatch alerts to your delivery boy and confirms buyer address landmark.", active: true }
+          ]
+        },
+        restaurant: {
+          title: "How Restaurants & Cafés Sell on WhatsApp",
+          subtitle: "From visual menu browsing to automated kitchen order tickets (KOT) and table reservations.",
+          stages: [
+            { id: "res-1", stageNum: "Stage 01", tag: "Menu Browse", title: "Visual WhatsApp Dish Menu", desc: "Interactive category cards with Veg/Non-Veg, Jain badges, and high-res food photos.", active: true },
+            { id: "res-2", stageNum: "Stage 02", tag: "Customization", title: "Add-ons, Crust & Spice Notes", desc: "Handles complex customer notes ('extra spicy', 'cheese burst', 'no onion') effortlessly.", active: true },
+            { id: "res-3", stageNum: "Stage 03", tag: "Kitchen POS", title: "Kitchen Order Ticket (KOT)", desc: "Instantly formats and pushes orders to your thermal kitchen printer or tablet POS.", active: true },
+            { id: "res-4", stageNum: "Stage 04", tag: "UPI & Booking", title: "Prepaid UPI & Table Booking", desc: "Collects 100% advance or deposit to prevent fake orders and holds table slots.", active: true },
+            { id: "res-5", stageNum: "Stage 05", tag: "Rider Webhook", title: "Live Dispatch & Rider Tracking", desc: "Sends real-time prep alerts ('Food is on the pan', 'Out for delivery') to the guest.", active: true }
+          ]
+        },
+        d2c: {
+          title: "How D2C Brands Convert on WhatsApp",
+          subtitle: "Turn social ad clicks into direct checkouts with camera visual search, cart recovery, and RTO COD defense.",
+          stages: [
+            { id: "d2c-1", stageNum: "Stage 01", tag: "Attribution", title: "Click-to-WhatsApp Ad Entry", desc: "Passes Instagram/Meta ad UTM parameters into the chat to identify campaign source.", active: true },
+            { id: "d2c-2", stageNum: "Stage 02", tag: "Visual AI", title: "Camera Photo Visual Matcher", desc: "Matches uploaded customer screenshots or influencer outfits to your exact Shopify/D2C SKU.", active: true },
+            { id: "d2c-3", stageNum: "Stage 03", tag: "COD Shield", title: "RTO Shield Risk Scoring", desc: "Evaluates buyer credibility (0-100 score) and offers ₹50 UPI prepaid discounts to high-risk orders.", active: true },
+            { id: "d2c-4", stageNum: "Stage 04", tag: "Recovery", title: "Smart Cart Abandonment Bot", desc: "Sends timed template nudges within the 24-hr Meta customer window with dynamic offers.", active: true },
+            { id: "d2c-5", stageNum: "Stage 05", tag: "Post-Purchase", title: "Automated Tracking & Reviews", desc: "Dispatches courier tracking updates and requests verified WhatsApp photo reviews post-delivery.", active: true }
+          ]
+        },
+        distributor: {
+          title: "How B2B Distributors Sell on WhatsApp",
+          subtitle: "Automate carton & pallet bulk orders, tiered dealer pricing slabs, and GST invoicing.",
+          stages: [
+            { id: "dis-1", stageNum: "Stage 01", tag: "Bulk Input", title: "Multi-SKU Purchase Order Sheet", desc: "Accepts carton/case quantities, PO attachments, and bulk multi-line order text.", active: true },
+            { id: "dis-2", stageNum: "Stage 02", tag: "Pricing Slabs", title: "Tiered B2B Volume Pricing", desc: "Applies customized wholesale discounts based on dealer tier and quantity thresholds.", active: true },
+            { id: "dis-3", stageNum: "Stage 03", tag: "Credit Control", title: "Credit Limit & Ledger Shield", desc: "Checks outstanding retailer balances against sanctioned credit limits before locking orders.", active: true },
+            { id: "dis-4", stageNum: "Stage 04", tag: "E-Invoicing", title: "Automated GST E-Invoice & PDF", desc: "Generates tax-compliant B2B invoices and dispatches instant PDF bills to merchant chat.", active: true },
+            { id: "dis-5", stageNum: "Stage 05", tag: "Logistics", title: "Warehouse Picking & Dispatch", desc: "Pushes picking slips to warehouse floor and sends truck driver contact details to buyer.", active: true }
+          ]
+        },
+        pharmacy: {
+          title: "How Licensed Pharmacies Operate on WhatsApp",
+          subtitle: "Prescription OCR, mandatory chemist sign-off gates, and automated chronic medication refills.",
+          stages: [
+            { id: "phm-1", stageNum: "Stage 01", tag: "Rx Vision", title: "Prescription Photo OCR", desc: "High-accuracy vision model reads doctor's handwriting, dosage, and duration instructions.", active: true },
+            { id: "phm-2", stageNum: "Stage 02", tag: "Compliance Gate", title: "Mandatory Pharmacist Sign-Off", desc: "Orders pause until a licensed registered pharmacist reviews the Rx and clicks digital approval.", active: true },
+            { id: "phm-3", stageNum: "Stage 03", tag: "Drug Safety", title: "Schedule H & Habit Shield", desc: "Strict deterministic block prevents unprescribed narcotics or restricted medicines.", active: true },
+            { id: "phm-4", stageNum: "Stage 04", tag: "Cold Chain", title: "Temperature-Safe Dispatch", desc: "Assigns cold-chain packaging protocols and triggers instant WhatsApp UPI payment link.", active: true },
+            { id: "phm-5", stageNum: "Stage 05", tag: "Retention", title: "30-Day Chronic Refill Reminder", desc: "Calculates dosage exhaustion date and prompts the patient for easy 1-click medicine reorders.", active: true }
+          ]
+        },
+        local_business: {
+          title: "How Local Service Businesses Sell on WhatsApp",
+          subtitle: "24/7 calendar appointment booking, advance token UPI deposits, and zero no-shows.",
+          stages: [
+            { id: "loc-1", stageNum: "Stage 01", tag: "Inquiry Bot", title: "Service Inquiry & Pricing Assistant", desc: "Answers customer questions on service packages, duration, stylist/doctor availability.", active: true },
+            { id: "loc-2", stageNum: "Stage 02", tag: "Slot Flow", title: "WhatsApp Flow Calendar Picker", desc: "Renders interactive date and time slot selection directly within the WhatsApp chat canvas.", active: true },
+            { id: "loc-3", stageNum: "Stage 03", tag: "Calendar Sync", title: "Google / Outlook Real-Time Sync", desc: "Syncs directly with staff calendars to prevent double-booking and reserve salon/clinic chairs.", active: true },
+            { id: "loc-4", stageNum: "Stage 04", tag: "No-Show Shield", title: "Advance Token UPI Deposit", desc: "Collects a small advance booking fee (e.g. ₹100-₹500) via UPI to guarantee appointment attendance.", active: true },
+            { id: "loc-5", stageNum: "Stage 05", tag: "Retention", title: "Automated Reminder & Review", desc: "Sends WhatsApp reminder 2 hours prior with directions, followed by a post-visit review link.", active: true }
+          ]
+        }
+      }
+    };
+
+    function selectOccupation(key) {
+      const data = vyapaarApp.occupations[key];
+      if (!data) return;
+
+      vyapaarApp.selectedOccupation = key;
+      localStorage.setItem('vyapaar_occupation', key);
+
+      // Update Card Visual States
+      document.querySelectorAll('.occupation-card').forEach(card => {
+        card.classList.remove('selected');
+        card.setAttribute('aria-checked', 'false');
+      });
+
+      const targetCard = document.getElementById('card-' + (key === 'local_business' ? 'local' : key));
+      if (targetCard) {
+        targetCard.classList.add('selected');
+        targetCard.setAttribute('aria-checked', 'true');
+      }
+
+      // Update Top Nav Pill
+      const pillText = document.getElementById('active-role-pill-text');
+      if (pillText) pillText.textContent = data.name;
+
+      // Update Auth Step Role Name
+      const authRoleName = document.getElementById('auth-role-name');
+      if (authRoleName) authRoleName.textContent = data.name;
+
+      // Update Spotlight Box
+      const eyebrow = document.getElementById('spotlight-eyebrow');
+      const title = document.getElementById('spotlight-title');
+      const desc = document.getElementById('spotlight-desc');
+      const highlights = document.getElementById('spotlight-highlights');
+      const prevLabel = document.getElementById('preview-header-label');
+      const prevUser = document.getElementById('preview-user-bubble');
+      const prevAi = document.getElementById('preview-ai-bubble');
+      const actionName = document.getElementById('action-bar-selected-name');
+
+      if (eyebrow) eyebrow.textContent = data.eyebrow;
+      if (title) title.textContent = data.title;
+      if (desc) desc.textContent = data.desc;
+      if (prevLabel) prevLabel.textContent = data.previewLabel;
+      if (prevUser) prevUser.innerHTML = data.userBubble;
+      if (prevAi) prevAi.innerHTML = data.aiBubble;
+      if (actionName) actionName.textContent = data.name;
+
+      if (highlights) {
+        highlights.innerHTML = data.highlights.map(item => `
+          <li>
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor"><use href="#icon-check"/></svg>
+            <span>${item}</span>
+          </li>
+        `).join('');
+      }
+
+      // Also update Process Flow on Home Page
+      renderProcessFlow();
+    }
+
+    
+    // Master View Switchers
+    function startOnboarding(occ, step = 1) {
+      const landing = document.getElementById('view-landing');
+      const onboarding = document.getElementById('view-onboarding');
+      if (landing) landing.style.display = 'none';
+      if (onboarding) onboarding.style.display = 'block';
+      if (occ) selectOccupation(occ);
+      goToStep(step);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function returnToLanding() {
+      const landing = document.getElementById('view-landing');
+      const onboarding = document.getElementById('view-onboarding');
+      if (onboarding) onboarding.style.display = 'none';
+      if (landing) landing.style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function goToStep(step) {
+      vyapaarApp.currentStep = step;
+
+      // Update merchant navbar badge if profile exists
+      if (vyapaarApp.merchantProfile) {
+        const navBtn = document.getElementById('nav-merchant-btn');
+        if (navBtn) navBtn.textContent = vyapaarApp.merchantProfile.name;
+      }
+
+      if (step === 3) {
+        renderProcessFlow();
+      }
+
+      if (step === 4) {
+        initStep4Data();
+      }
+
+      if (step === 5) {
+        initStep5Data();
+      }
+
+      // Toggle views
+      for (let i = 1; i <= 5; i++) {
+        const view = document.getElementById('view-step' + i);
+        const dot = document.getElementById('dot-step-' + i);
+        if (view) {
+          if (i === step) {
+            view.classList.add('view-active');
+            view.style.display = 'block';
+          } else {
+            view.classList.remove('view-active');
+            view.style.display = 'none';
+          }
+        }
+        if (dot) {
+          dot.classList.remove('active', 'completed');
+          if (i === step) {
+            dot.classList.add('active');
+          } else if (i < step) {
+            dot.classList.add('completed');
+          }
+        }
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function continueFromOccupation() {
+      goToStep(2);
+    }
+
+    function setAuthTab(tab) {
+      const tabSignup = document.getElementById('tab-signup');
+      const tabSignin = document.getElementById('tab-signin');
+      const formSignup = document.getElementById('auth-form-signup');
+      const formSignin = document.getElementById('auth-form-signin');
+
+      if (tab === 'signup') {
+        tabSignup.classList.add('active');
+        tabSignup.setAttribute('aria-selected', 'true');
+        tabSignin.classList.remove('active');
+        tabSignin.setAttribute('aria-selected', 'false');
+        formSignup.style.display = 'flex';
+        formSignin.style.display = 'none';
+      } else {
+        tabSignin.classList.add('active');
+        tabSignin.setAttribute('aria-selected', 'true');
+        tabSignup.classList.remove('active');
+        tabSignup.setAttribute('aria-selected', 'false');
+        formSignin.style.display = 'flex';
+        formSignup.style.display = 'none';
+      }
+    }
+
+    function handleAuthSubmit(e, type) {
+      if (e) e.preventDefault();
+
+      let name = "Merchant Partner";
+      let phone = "9876543210";
+      let email = "merchant@vyapaar.in";
+
+      if (type === 'signup') {
+        name = document.getElementById('signup-name')?.value || name;
+        phone = document.getElementById('signup-phone')?.value || phone;
+        email = document.getElementById('signup-email')?.value || email;
+      } else {
+        const idVal = document.getElementById('signin-identifier')?.value || '';
+        if (idVal.includes('@')) email = idVal;
+        else if (idVal) phone = idVal;
+      }
+
+      vyapaarApp.merchantProfile = { name, phone, email, isDemo: false };
+      localStorage.setItem('vyapaar_merchant', JSON.stringify(vyapaarApp.merchantProfile));
+
+      // Advance to Step 3
+      goToStep(3);
+    }
+
+    function instantDemoLogin() {
+      vyapaarApp.merchantProfile = {
+        name: "Rohan Sharma",
+        phone: "9876543210",
+        email: "rohan@freshbasket.in",
+        isDemo: true
+      };
+      localStorage.setItem('vyapaar_merchant', JSON.stringify(vyapaarApp.merchantProfile));
+
+      // Pre-fill fields for Step 4
+      const ownerInput = document.getElementById('biz-owner-name');
+      const phoneInput = document.getElementById('biz-phone');
+      if (ownerInput) ownerInput.value = "Rohan Sharma";
+      if (phoneInput) phoneInput.value = "9876543210";
+
+      // Advance to Step 3
+      goToStep(3);
+    }
+
+    function proceedToStep4() {
+      goToStep(4);
+    }
+
+    function renderProcessFlow() {
+      const occKey = vyapaarApp.selectedOccupation || 'retailer';
+      const pipeline = vyapaarApp.pipelines[occKey] || vyapaarApp.pipelines.retailer;
+      const occData = vyapaarApp.occupations[occKey] || vyapaarApp.occupations.retailer;
+
+      // Update text in Header
+      const eyebrow = document.getElementById('flow-eyebrow-text');
+      const title = document.getElementById('flow-main-title');
+      const subtitle = document.getElementById('flow-main-subtitle');
+      if (eyebrow) eyebrow.textContent = `Personalized Architecture for ${occData.name}s`;
+      if (title) title.textContent = pipeline.title;
+      if (subtitle) subtitle.textContent = pipeline.subtitle;
+
+      // Render Stage Cards
+      const container = document.getElementById('flow-stages-container');
+      if (!container) return;
+
+      container.innerHTML = pipeline.stages.map((stg, idx) => `
+        <div class="flow-stage-card ${stg.active ? '' : 'disabled'}" id="stage-card-${idx}">
+          <div>
+            <div class="stage-top-meta">
+              <span class="stage-pill">${stg.stageNum} · ${stg.tag}</span>
+              <label class="flow-switch-label" title="Toggle this process for your business">
+                <input type="checkbox" id="switch-stage-${idx}" ${stg.active ? 'checked' : ''} onchange="toggleStageProcess(${idx}, this.checked)" />
+              </label>
+            </div>
+            <div class="stage-icon-circle">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+              </svg>
+            </div>
+            <h4 class="stage-title">${stg.title}</h4>
+            <p class="stage-desc">${stg.desc}</p>
+          </div>
+          <div class="stage-footer-status">
+            <span>Process Status</span>
+            <span class="status-active-tag" id="status-tag-${idx}">
+              <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="10" r="8"/></svg>
+              <span>${stg.active ? 'Active' : 'Disabled'}</span>
+            </span>
+          </div>
+        </div>
+      `).join('');
+
+      updateProcessFlowCount();
+    }
+
+    function toggleStageProcess(idx, isChecked) {
+      const occKey = vyapaarApp.selectedOccupation || 'retailer';
+      const pipeline = vyapaarApp.pipelines[occKey];
+      if (pipeline && pipeline.stages[idx]) {
+        pipeline.stages[idx].active = isChecked;
+      }
+
+      const card = document.getElementById(`stage-card-${idx}`);
+      const tag = document.getElementById(`status-tag-${idx}`);
+      if (card) {
+        if (isChecked) card.classList.remove('disabled');
+        else card.classList.add('disabled');
+      }
+      if (tag) {
+        tag.querySelector('span').textContent = isChecked ? 'Active' : 'Disabled';
+      }
+
+      updateProcessFlowCount();
+    }
+
+    function selectAllProcesses() {
+      const occKey = vyapaarApp.selectedOccupation || 'retailer';
+      const pipeline = vyapaarApp.pipelines[occKey];
+      if (pipeline) {
+        pipeline.stages.forEach((stg, idx) => {
+          stg.active = true;
+          const sw = document.getElementById(`switch-stage-${idx}`);
+          if (sw) sw.checked = true;
+          const card = document.getElementById(`stage-card-${idx}`);
+          if (card) card.classList.remove('disabled');
+          const tag = document.getElementById(`status-tag-${idx}`);
+          if (tag) tag.querySelector('span').textContent = 'Active';
+        });
+        updateProcessFlowCount();
+      }
+    }
+
+    function updateProcessFlowCount() {
+      const occKey = vyapaarApp.selectedOccupation || 'retailer';
+      const pipeline = vyapaarApp.pipelines[occKey];
+      if (!pipeline) return;
+
+      const activeCount = pipeline.stages.filter(s => s.active).length;
+      const countEl = document.getElementById('flow-active-count');
+      const subTextEl = document.getElementById('flow-action-subtext');
+
+      if (countEl) countEl.textContent = activeCount;
+      if (subTextEl) {
+        subTextEl.textContent = `${activeCount} of 5 automated modules active for your WhatsApp store. Next: configure your business profile & catalog.`;
+      }
+    }
+
+    // Step 4: Business Details Setup Functions
+    function selectDeliveryMode(mode) {
+      ['local', 'pickup', 'courier'].forEach(m => {
+        const card = document.getElementById('del-card-' + m);
+        if (card) {
+          if (m === mode) {
+            card.classList.add('active');
+            const input = card.querySelector('input');
+            if (input) input.checked = true;
+          } else {
+            card.classList.remove('active');
+            const input = card.querySelector('input');
+            if (input) input.checked = false;
+          }
+        }
+      });
+    }
+
+    function updateBizPreview() {
+      const storeNameInput = document.getElementById('biz-store-name');
+      const phoneInput = document.getElementById('biz-phone');
+      const catInput = document.getElementById('biz-category');
+      const cityInput = document.getElementById('biz-city');
+
+      const titleEl = document.getElementById('preview-store-title');
+      const avatarLetterEl = document.getElementById('preview-avatar-letter');
+      const phoneDisplayEl = document.getElementById('preview-store-phone-display');
+      const catPillEl = document.getElementById('preview-pill-category');
+      const cityPillEl = document.getElementById('preview-pill-city');
+      const welcomeBubbleEl = document.getElementById('preview-welcome-bubble');
+
+      const nameVal = storeNameInput?.value.trim() || 'FreshBasket Kirana';
+      const phoneVal = phoneInput?.value.trim() || '9876543210';
+      const catVal = catInput?.value || 'Kirana, Grocery & Supermarket';
+      const cityVal = cityInput?.value.trim() || 'Mumbai';
+
+      if (titleEl) titleEl.textContent = nameVal;
+      if (avatarLetterEl) avatarLetterEl.textContent = nameVal.charAt(0).toUpperCase() || 'S';
+      if (phoneDisplayEl) phoneDisplayEl.textContent = '+91 ' + (phoneVal.length === 10 ? phoneVal.slice(0, 5) + ' ' + phoneVal.slice(5) : phoneVal);
+      if (catPillEl) catPillEl.textContent = catVal.split(',')[0];
+      if (cityPillEl) cityPillEl.textContent = cityVal;
+
+      if (welcomeBubbleEl) {
+        welcomeBubbleEl.innerHTML = `Namaste! 🙏 Welcome to <strong>${nameVal}</strong>. You can send us a voice note in Hinglish, snap a photo of your list or inquiries, or browse our verified catalog! <span class="preview-bubble-time">Just now · Verified Business</span>`;
+      }
+    }
+
+    function initStep4Data() {
+      const occKey = vyapaarApp.selectedOccupation || 'retailer';
+      const ownerInput = document.getElementById('biz-owner-name');
+      const phoneInput = document.getElementById('biz-phone');
+      const storeNameInput = document.getElementById('biz-store-name');
+      const catInput = document.getElementById('biz-category');
+      const cityInput = document.getElementById('biz-city');
+
+      if (vyapaarApp.merchantProfile) {
+        if (ownerInput && !ownerInput.value) ownerInput.value = vyapaarApp.merchantProfile.name;
+        if (phoneInput && !phoneInput.value) phoneInput.value = vyapaarApp.merchantProfile.phone;
+      }
+
+      const defaults = {
+        retailer: { name: "FreshBasket Kirana & Mart", cat: "Kirana, Grocery & Supermarket" },
+        restaurant: { name: "The Daily Spice Café & Kitchen", cat: "Restaurant, Café & Cloud Kitchen" },
+        d2c: { name: "Aura Apparel & Lifestyle Co.", cat: "Apparel, Beauty & D2C Brand" },
+        distributor: { name: "Sri Balaji Wholesale Supply", cat: "Wholesale & B2B Distribution" },
+        pharmacy: { name: "Apollo Care Pharmacy & Chemist", cat: "Pharmacy, Chemist & Wellness" },
+        local_business: { name: "StyleStudio Salon & Spa", cat: "Services, Salon & Clinic" }
+      };
+
+      const def = defaults[occKey] || defaults.retailer;
+      if (storeNameInput && !storeNameInput.value) storeNameInput.value = def.name;
+      if (catInput && !catInput.value) catInput.value = def.cat;
+      if (cityInput && !cityInput.value) cityInput.value = "Mumbai";
+
+      updateBizPreview();
+    }
+
+    function handleBizDetailsSubmit(e) {
+      if (e) e.preventDefault();
+
+      vyapaarApp.businessDetails = {
+        ownerName: document.getElementById('biz-owner-name')?.value || '',
+        phone: document.getElementById('biz-phone')?.value || '',
+        storeName: document.getElementById('biz-store-name')?.value || '',
+        category: document.getElementById('biz-category')?.value || '',
+        city: document.getElementById('biz-city')?.value || '',
+        pincode: document.getElementById('biz-pincode')?.value || '',
+        deliveryMode: document.querySelector('input[name="delivery_mode"]:checked')?.value || 'local',
+        gstin: document.getElementById('biz-gstin')?.value || ''
+      };
+
+      localStorage.setItem('vyapaar_business', JSON.stringify(vyapaarApp.businessDetails));
+      goToStep(5);
+    }
+
+    // Step 5: Product Catalogue & Launch Functions
+    vyapaarApp.hasScraped = false;
+
+    vyapaarApp.catalogSamples = {
+      retailer: [
+        { name: "Amul Taaza Toned Milk (1L)", cat: "Dairy & Eggs", price: 56, stock: "In Stock (42)", image: "https://images.unsplash.com/photo-1550583724-b2692b85b150?w=400&h=400&fit=crop&q=80" },
+        { name: "Aashirvaad Shudh Chakki Atta (5kg)", cat: "Staples & Grains", price: 265, stock: "In Stock (18)", image: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&h=400&fit=crop&q=80" },
+        { name: "Tata Iodized Salt (1kg)", cat: "Cooking Essentials", price: 28, stock: "In Stock (50)", image: "https://images.unsplash.com/photo-1518110925495-5fe2fda0442c?w=400&h=400&fit=crop&q=80" },
+        { name: "Fortune Sunlite Refined Oil (1L)", cat: "Edible Oils", price: 145, stock: "In Stock (24)", image: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=400&h=400&fit=crop&q=80" },
+        { name: "Bru Instant Coffee (100g)", cat: "Beverages", price: 215, stock: "In Stock (15)", image: "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=400&h=400&fit=crop&q=80" },
+        { name: "India Gate Basmati Rice (5kg)", cat: "Rice & Grains", price: 480, stock: "In Stock (12)", image: "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=400&h=400&fit=crop&q=80" }
+      ],
+      restaurant: [
+        { name: "Paneer Tikka Pizza (10-inch)", cat: "Woodfired Pizza", price: 349, stock: "Ready to Fire", image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400&h=400&fit=crop&q=80" },
+        { name: "Dum Murgh Biryani (Handi)", cat: "Biryanis & Rice", price: 389, stock: "Ready to Fire", image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=400&h=400&fit=crop&q=80" },
+        { name: "Crispy Chilli Babycorn", cat: "Starters & Appetizers", price: 210, stock: "Ready to Fire", image: "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&h=400&fit=crop&q=80" },
+        { name: "Dal Makhani (Slow Cooked)", cat: "Main Course", price: 260, stock: "Ready to Fire", image: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400&h=400&fit=crop&q=80" },
+        { name: "Gulab Jamun (2 Pieces)", cat: "Desserts", price: 80, stock: "In Kitchen", image: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=400&h=400&fit=crop&q=80" },
+        { name: "Diet Coke Can (300ml)", cat: "Beverages", price: 40, stock: "Chilled (30)", image: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=400&h=400&fit=crop&q=80" }
+      ],
+      d2c: [
+        { name: "Aura Linen Oversized Shirt - Sage", cat: "Men's Apparel", price: 1499, stock: "8 in stock", image: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&h=400&fit=crop&q=80" },
+        { name: "Organic Heavyweight Cotton Tee", cat: "Casual Wear", price: 799, stock: "22 in stock", image: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=400&h=400&fit=crop&q=80" },
+        { name: "Handcrafted Top-Grain Leather Wallet", cat: "Accessories", price: 1199, stock: "14 in stock", image: "https://images.unsplash.com/photo-1627123424574-724758594e93?w=400&h=400&fit=crop&q=80" },
+        { name: "Vitamin C 15% Brightening Serum", cat: "Skincare", price: 649, stock: "35 in stock", image: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=400&h=400&fit=crop&q=80" },
+        { name: "Minimalist Aero-Light Sneakers", cat: "Footwear", price: 2899, stock: "5 in stock", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop&q=80" },
+        { name: "Canvas Everyday Work Tote", cat: "Bags", price: 1250, stock: "11 in stock", image: "https://images.unsplash.com/photo-1544816155-12df9643f363?w=400&h=400&fit=crop&q=80" }
+      ],
+      distributor: [
+        { name: "Parle-G 100g Case (60 Packs)", cat: "Biscuits & Confectionery", price: 1440, stock: "85 Cases", image: "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400&h=400&fit=crop&q=80" },
+        { name: "Fortune Sunflower Oil 1L (Carton of 12)", cat: "Cooking Medium", price: 1560, stock: "120 Cartons", image: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=400&h=400&fit=crop&q=80" },
+        { name: "Maggi 2-Min Noodles (Case of 96)", cat: "Instant Food", price: 1150, stock: "60 Cases", image: "https://images.unsplash.com/photo-1612927601601-6638404737ce?w=400&h=400&fit=crop&q=80" },
+        { name: "Surf Excel Easy Wash 1kg (Case of 18)", cat: "Home Care & Detergents", price: 2160, stock: "40 Cases", image: "https://images.unsplash.com/photo-1585421514738-01798e348b17?w=400&h=400&fit=crop&q=80" },
+        { name: "Tata Tea Gold 500g (Case of 20)", cat: "Tea & Hot Beverages", price: 4200, stock: "30 Cases", image: "https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=400&h=400&fit=crop&q=80" },
+        { name: "Dettol Antiseptic Liquid 500ml (Case of 24)", cat: "Personal Hygiene", price: 3400, stock: "45 Cases", image: "https://images.unsplash.com/photo-1584744982491-665216d95f8b?w=400&h=400&fit=crop&q=80" }
+      ],
+      pharmacy: [
+        { name: "Metformin Hydrochloride 500mg (60 Tabs)", cat: "Diabetes Care", price: 120, stock: "In Dispensary (50)", image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&h=400&fit=crop&q=80" },
+        { name: "Telmisartan 40mg Strip (30 Tabs)", cat: "Cardiovascular", price: 190, stock: "In Dispensary (40)", image: "https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=400&h=400&fit=crop&q=80" },
+        { name: "Dolo 650mg Paracetamol (15 Tabs)", cat: "Pain & Fever Relief", price: 34, stock: "In Dispensary (120)", image: "https://images.unsplash.com/photo-1584017911766-d451b3d0e843?w=400&h=400&fit=crop&q=80" },
+        { name: "Cetirizine 10mg Anti-Allergy (10 Tabs)", cat: "Allergy Relief", price: 28, stock: "In Dispensary (80)", image: "https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=400&h=400&fit=crop&q=80" },
+        { name: "Digene Antacid Orange Gel (200ml)", cat: "Digestive Wellness", price: 165, stock: "In Dispensary (25)", image: "https://images.unsplash.com/photo-1550572017-edd951aa8f72?w=400&h=400&fit=crop&q=80" },
+        { name: "Volini Joint & Muscle Pain Gel (75g)", cat: "Topical Pain Relief", price: 230, stock: "In Dispensary (35)", image: "https://images.unsplash.com/photo-1556760544-74068565f05c?w=400&h=400&fit=crop&q=80" }
+      ],
+      local_business: [
+        { name: "Haircut & Luxury Beard Sculpting", cat: "Styling Services", price: 450, stock: "45 mins slot", image: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=400&h=400&fit=crop&q=80" },
+        { name: "Deep Pore Charcoal Glow Facial", cat: "Skin Treatments", price: 899, stock: "60 mins slot", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=400&h=400&fit=crop&q=80" },
+        { name: "Intense Keratin Hair Spa & Massage", cat: "Hair Care", price: 1199, stock: "75 mins slot", image: "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=400&h=400&fit=crop&q=80" },
+        { name: "Split AC Deep Jet Wash & Gas Test", cat: "Home Maintenance", price: 799, stock: "90 mins slot", image: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=400&h=400&fit=crop&q=80" },
+        { name: "2BHK Deep Sanitization Cleaning", cat: "Home Services", price: 2499, stock: "Half day slot", image: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=400&h=400&fit=crop&q=80" },
+        { name: "Comprehensive Dental Scaling & Polish", cat: "Dental Clinic", price: 600, stock: "30 mins slot", image: "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=400&h=400&fit=crop&q=80" }
+      ]
+    };
+
+    vyapaarApp.manualItems = [];
+
+    function selectCatPathway(mode) {
+      const cardUrl = document.getElementById('choice-card-url');
+      const cardManual = document.getElementById('choice-card-manual');
+      const panelUrl = document.getElementById('cat-panel-url');
+      const panelManual = document.getElementById('cat-panel-manual');
+
+      if (mode === 'url') {
+        cardUrl.classList.add('active');
+        cardManual.classList.remove('active');
+        panelUrl.style.display = 'block';
+        panelManual.style.display = 'none';
+      } else {
+        cardManual.classList.add('active');
+        cardUrl.classList.remove('active');
+        panelManual.style.display = 'block';
+        panelUrl.style.display = 'none';
+        if (vyapaarApp.manualItems.length === 0) {
+          loadIndustryPresets();
+        }
+      }
+    }
+
+    function runWebsiteScraper() {
+      const urlInput = document.getElementById('input-website-url');
+      const urlVal = urlInput?.value.trim() || 'www.freshbasket.in';
+      const placeholder = document.getElementById('scraper-placeholder-card');
+      const terminal = document.getElementById('scanner-status-box');
+      const progressBar = document.getElementById('scanner-progress-bar');
+      const logsList = document.getElementById('scanner-logs');
+      const displayUrl = document.getElementById('scanner-url-display');
+      const btnScrape = document.getElementById('btn-run-scrape');
+      const container = document.getElementById('scraped-products-container');
+
+      if (placeholder) placeholder.style.display = 'none';
+      if (container) container.style.display = 'none';
+      if (!terminal) return;
+
+      terminal.style.display = 'block';
+      if (displayUrl) displayUrl.textContent = `Target: https://${urlVal.replace(/^https?:\/\//, '')}`;
+      if (btnScrape) {
+        btnScrape.disabled = true;
+        btnScrape.innerHTML = '<span class="demo-pulse-dot" style="display:inline-block; margin-right:6px;"></span><span>Crawling Storefront...</span>';
+      }
+
+      logsList.innerHTML = '<li>[1/4] Handshaking with target domain & fetching sitemap index...</li>';
+      progressBar.style.width = '20%';
+
+      setTimeout(() => {
+        logsList.innerHTML += '<li>[2/4] Parsing product pages, high-res photos & structured JSON-LD...</li>';
+        progressBar.style.width = '55%';
+      }, 700);
+
+      setTimeout(() => {
+        logsList.innerHTML += '<li>[3/4] Normalizing Indian Rupee prices, SKU variants & inventory levels...</li>';
+        progressBar.style.width = '85%';
+      }, 1400);
+
+      setTimeout(() => {
+        logsList.innerHTML += '<li style="color:#6EE7B7; font-weight:700;">[4/4] ✓ Successfully extracted 6 verified catalog items with images! Ready for WhatsApp sync.</li>';
+        progressBar.style.width = '100%';
+        vyapaarApp.hasScraped = true;
+        
+        if (btnScrape) {
+          btnScrape.disabled = false;
+          btnScrape.innerHTML = '<svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor"><path d="M16.7 5.3a1 1 0 0 1 0 1.4l-8 8a1 1 0 0 1-1.4 0l-4-4a1 1 0 1 1 1.4-1.4L8 12.6l7.3-7.3a1 1 0 0 1 1.4 0z"/></svg><span>Extracted 6 Products (Re-scrape)</span>';
+        }
+        
+        renderScrapedProducts();
+        if (container) {
+          container.style.display = 'grid';
+          container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      }, 2100);
+    }
+
+    function renderScrapedProducts() {
+      const occKey = vyapaarApp.selectedOccupation || 'retailer';
+      const items = vyapaarApp.catalogSamples[occKey] || vyapaarApp.catalogSamples.retailer;
+      const container = document.getElementById('scraped-products-container');
+      if (!container) return;
+
+      container.innerHTML = items.map(item => `
+        <div class="product-item-card">
+          <div class="prod-thumb-box">
+            <img src="${item.image}" alt="${item.name}" loading="lazy" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&h=300&fit=crop&q=80';" />
+          </div>
+          <div>
+            <div class="prod-meta-top">
+              <span class="prod-cat-tag">${item.cat}</span>
+              <span class="prod-stock-badge">${item.stock}</span>
+            </div>
+            <div class="prod-name">${item.name}</div>
+          </div>
+          <div class="prod-price-row">
+            <span style="font-size:0.8rem; color:var(--text-muted);">Verified Price</span>
+            <span class="prod-price-val">₹${item.price}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function loadIndustryPresets() {
+      const occKey = vyapaarApp.selectedOccupation || 'retailer';
+      const items = vyapaarApp.catalogSamples[occKey] || vyapaarApp.catalogSamples.retailer;
+      vyapaarApp.manualItems = JSON.parse(JSON.stringify(items));
+      renderManualTable();
+    }
+
+    function renderManualTable() {
+      const tbody = document.getElementById('manual-table-body');
+      if (!tbody) return;
+
+      if (vyapaarApp.manualItems.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:24px; color:var(--text-muted);">No products yet. Click "Load Starter Presets" above or add items using the form.</td></tr>`;
+        return;
+      }
+
+      const defaultPlaceholder = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=100&h=100&fit=crop&q=80';
+
+      tbody.innerHTML = vyapaarApp.manualItems.map((item, idx) => `
+        <tr>
+          <td>
+            <img src="${item.image || defaultPlaceholder}" class="table-prod-img" alt="${item.name}" loading="lazy" onerror="this.onerror=null; this.src='${defaultPlaceholder}';" />
+          </td>
+          <td><strong>${item.name}</strong></td>
+          <td><span class="preview-pill">${item.cat}</span></td>
+          <td><strong style="font-family:var(--font-mono); color:var(--bg-forest);">₹${item.price}</strong></td>
+          <td><span style="color:var(--accent-emerald-dark); font-size:0.82rem; font-weight:600;">${item.stock}</span></td>
+          <td style="text-align:right;">
+            <button type="button" class="btn-del-item" onclick="deleteManualProduct(${idx})" title="Remove item">×</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function addManualProduct() {
+      const nameInput = document.getElementById('manual-p-name');
+      const priceInput = document.getElementById('manual-p-price');
+      const catInput = document.getElementById('manual-p-cat');
+      const imgInput = document.getElementById('manual-p-image');
+
+      const name = nameInput?.value.trim();
+      const price = parseFloat(priceInput?.value);
+      const cat = catInput?.value.trim() || 'General';
+      let image = imgInput?.value.trim();
+
+      if (!name || isNaN(price)) {
+        alert('Please enter a valid product name and price.');
+        return;
+      }
+
+      if (!image) {
+        image = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&h=300&fit=crop&q=80';
+      }
+
+      vyapaarApp.manualItems.push({
+        name,
+        price,
+        cat,
+        image,
+        stock: "In Stock"
+      });
+
+      nameInput.value = '';
+      priceInput.value = '';
+      catInput.value = '';
+      if (imgInput) imgInput.value = '';
+
+      renderManualTable();
+    }
+
+    function deleteManualProduct(idx) {
+      vyapaarApp.manualItems.splice(idx, 1);
+      renderManualTable();
+    }
+
+    function launchStorefront() {
+      const occKey = vyapaarApp.selectedOccupation || 'retailer';
+      const occData = vyapaarApp.occupations[occKey] || vyapaarApp.occupations.retailer;
+      const biz = vyapaarApp.businessDetails || {};
+
+      const modalStore = document.getElementById('modal-summary-store');
+      const modalPhone = document.getElementById('modal-summary-phone');
+      const modalOcc = document.getElementById('modal-summary-occ');
+      const modalItems = document.getElementById('modal-summary-items');
+
+      if (modalStore) modalStore.textContent = biz.storeName || document.getElementById('biz-store-name')?.value || 'FreshBasket Kirana';
+      if (modalPhone) {
+        const p = biz.phone || document.getElementById('biz-phone')?.value || '9876543210';
+        modalPhone.textContent = '+91 ' + p;
+      }
+      if (modalOcc) modalOcc.textContent = occData.name;
+      if (modalItems) {
+        const count = vyapaarApp.manualItems.length > 0 ? vyapaarApp.manualItems.length : (vyapaarApp.catalogSamples[occKey] || []).length;
+        modalItems.textContent = `${count} SKUs Synced to WhatsApp`;
+      }
+
+      const modal = document.getElementById('modal-launch-success');
+      if (modal) modal.classList.add('modal-open');
+    }
+
+    function closeLaunchModal() {
+      const modal = document.getElementById('modal-launch-success');
+      if (modal) modal.classList.remove('modal-open');
+    }
+
+    function initStep5Data() {
+      const occKey = vyapaarApp.selectedOccupation || 'retailer';
+      const occData = vyapaarApp.occupations[occKey] || vyapaarApp.occupations.retailer;
+      const btnPresetLabel = document.getElementById('btn-preset-label');
+      if (btnPresetLabel) {
+        btnPresetLabel.textContent = `Load ${occData.name} Starter Presets`;
+      }
+
+      // Catalog section below only appears when user presses "Scrape & Extract Products"
+      const container = document.getElementById('scraped-products-container');
+      const terminal = document.getElementById('scanner-status-box');
+      const placeholder = document.getElementById('scraper-placeholder-card');
+
+      if (!vyapaarApp.hasScraped) {
+        if (container) container.style.display = 'none';
+        if (terminal) terminal.style.display = 'none';
+        if (placeholder) placeholder.style.display = 'block';
+      } else {
+        renderScrapedProducts();
+        if (placeholder) placeholder.style.display = 'none';
+        if (container) container.style.display = 'grid';
+      }
+    } Starter Presets`;
+      }
+      renderScrapedProducts();
+    }
+
+    // Initialize on Load
+    document.addEventListener('DOMContentLoaded', () => {
+      // Ensure landing page is primary view
+      const landing = document.getElementById('view-landing');
+      const onboarding = document.getElementById('view-onboarding');
+      if (landing) landing.style.display = 'block';
+      if (onboarding) onboarding.style.display = 'none';
+
+      const savedOcc = localStorage.getItem('vyapaar_occupation') || 'retailer';
+      selectOccupation(savedOcc);
+      goToStep(1);
+    });
+  </script>
+</body>
+</html>
