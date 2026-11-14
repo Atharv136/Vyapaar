@@ -3,5 +3,4 @@ packages:
   - "packages/*"
   - "whatsapp-bot-control"
 
-allowBuilds:
-  esbuild: true
+blockExoticSubdeps: false
