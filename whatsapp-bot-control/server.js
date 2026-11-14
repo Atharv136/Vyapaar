@@ -29,7 +29,7 @@ process.on('unhandledRejection', (reason) => {
 
 // ─── 1. Config ────────────────────────────────────────────────────────────────
 dotenv.config({ path: path.join(__dirname, '../.env') });
-dotenv.config({ path: path.join(__dirname, '.env') });
+dotenv.config({ path: path.join(__dirname, '.env'), override: true });
 
 const PORT            = 3001;
 const UPI_VPA         = process.env.UPI_VPA         || 'cafevaidehi.demo@upi';
@@ -114,6 +114,11 @@ const KNOWN_ALIASES = {
   coke      : ['diet coke','coca cola','cocacola','coke','cold drink','cokes','cola']
 };
 
+// Default prices used when catalog item lookup fails
+const DEFAULT_PRICES = {
+  pizza:349, biryani:389, babycorn:210, dal:260, gulabjamun:80, coke:40
+};
+
 const WORD_NUM = {
   a:1,an:1,one:1,ek:1,
   two:2,do:2,
@@ -145,12 +150,16 @@ function getAliases(item) {
 function extractOrderItems(raw, catalog) {
   const text = (raw||'').toLowerCase();
   const out  = [];
+  const matchedNames = new Set();
+  console.log(`🔍 extractOrderItems input: "${text.slice(0,120)}"`);
+
+  // Pass 1: match against active catalog
   for (const item of (catalog || activeStoreConfig.catalog)) {
     const aliases = getAliases(item);
     for (const alias of aliases) {
       if (text.includes(alias)) {
         const idx    = text.indexOf(alias);
-        const prefix = text.substring(Math.max(0, idx-25), idx).trim();
+        const prefix = text.substring(Math.max(0, idx-30), idx).trim();
         let qty = 1;
         const nm = prefix.match(/(\d+)\s*(?:x|\*|plate|plates|portion|portions|can|cans|piece|pieces|bottle|bottles)?\s*$/);
         if (nm) { qty = parseInt(nm[1],10); }
@@ -158,11 +167,59 @@ function extractOrderItems(raw, catalog) {
           const wm = prefix.match(/\b(a|an|one|two|three|four|five|six|seven|eight|nine|ten|ek|do|teen|char|chaar|panch|che|saat|aath|nau|das)\s*(?:x|\*|plate|plates|portion|portions|can|cans|piece|pieces|bottle|bottles)?\s*$/);
           if (wm && WORD_NUM[wm[1]]) qty = WORD_NUM[wm[1]];
         }
+        console.log(`  ✅ Matched "${alias}" for ${item.name} qty=${qty} (prefix: "${prefix}")`);
         out.push({ name:item.name, price:item.price, qty });
+        matchedNames.add(item.name);
         break;
       }
     }
   }
+
+  // Pass 2: fallback — check KNOWN_ALIASES for items NOT already matched
+  // (handles case where active catalog is non-restaurant but customer orders food by generic name)
+  const catalogNames = (catalog || activeStoreConfig.catalog).map(i => i.name);
+  for (const [key, aliases] of Object.entries(KNOWN_ALIASES)) {
+    // Check if this key's catalog item was already matched
+    const catalogItem = (catalog || activeStoreConfig.catalog).find(i =>
+      aliases.some(a => i.name.toLowerCase().includes(a))
+    );
+    if (catalogItem && matchedNames.has(catalogItem.name)) continue; // already matched
+
+    // Check if this alias key appears in the text
+    const foundAlias = aliases.find(a => text.includes(a));
+    if (foundAlias) {
+      // If we already matched this via the catalog, skip
+      if (catalogItem && matchedNames.has(catalogItem.name)) continue;
+
+      const idx    = text.indexOf(foundAlias);
+      const prefix = text.substring(Math.max(0, idx-30), idx).trim();
+      let qty = 1;
+      const nm = prefix.match(/(\d+)\s*(?:x|\*|plate|plates|portion|portions|can|cans|piece|pieces|bottle|bottles)?\s*$/);
+      if (nm) { qty = parseInt(nm[1],10); }
+      else {
+        const wm = prefix.match(/\b(a|an|one|two|three|four|five|six|seven|eight|nine|ten|ek|do|teen|char|chaar|panch|che|saat|aath|nau|das)\s*(?:x|\*|plate|plates|portion|portions|can|cans|piece|pieces|bottle|bottles)?\s*$/);
+        if (wm && WORD_NUM[wm[1]]) qty = WORD_NUM[wm[1]];
+      }
+
+      if (catalogItem) {
+        // Use the catalog item with actual price
+        console.log(`  ✅ [Pass2] Matched "${foundAlias}" → catalog item ${catalogItem.name} qty=${qty}`);
+        out.push({ name:catalogItem.name, price:catalogItem.price, qty });
+        matchedNames.add(catalogItem.name);
+      } else {
+        // No catalog item — use pretty name from key with default price
+        const prettyNames = { pizza:'Pizza', biryani:'Biryani', babycorn:'Chilli Babycorn', dal:'Dal Makhani', gulabjamun:'Gulab Jamun', coke:'Coke' };
+        const defaultPrices = { pizza:349, biryani:389, babycorn:210, dal:260, gulabjamun:80, coke:40 };
+        const name  = prettyNames[key] || key;
+        const price = defaultPrices[key] || 0;
+        console.log(`  ✅ [Pass2-fallback] Matched "${foundAlias}" → ${name} qty=${qty} (default price ₹${price})`);
+        out.push({ name, price, qty });
+        matchedNames.add(name);
+      }
+    }
+  }
+
+  console.log(`🔍 extractOrderItems found ${out.length} items`);
   return out;
 }
 
@@ -258,10 +315,14 @@ async function callSarvam(jid, messageForAgent, customer) {
 
 // ─── 8. Gemini — Audio STT Transcription Only ────────────────────────────────
 async function transcribeAudio(base64Audio, mimeType) {
-  if (!aiClient) return null;
+  if (!aiClient) {
+    console.warn('⚠️ [Audio STT] Cannot transcribe voice note: GEMINI_API_KEY is not configured in whatsapp-bot-control/.env!');
+    return null;
+  }
   try {
+    console.log(`🎙️ Transcribing voice note with Gemini (${(mimeType || 'audio/ogg').split(';')[0]})...`);
     const response = await aiClient.models.generateContent({
-      model   : 'gemini-3-flash-preview',
+      model   : 'gemini-2.0-flash',
       contents: [{
         role : 'user',
         parts: [
@@ -272,20 +333,39 @@ async function transcribeAudio(base64Audio, mimeType) {
             }
           },
           {
-            text: 'Transcribe this WhatsApp voice note exactly as spoken. ' +
-                  'Output ONLY the transcribed text in the customer\'s language — ' +
-                  'no explanation, no translation, just the words.'
+            text: 'Transcribe this WhatsApp voice note audio accurately. ' +
+                  'The user might speak in Hindi, Hinglish, Marathi, English, or any Indian regional language. ' +
+                  'Output ONLY the transcribed words in the exact same language/dialect spoken. ' +
+                  'Do NOT explain, summarize, or translate. Just return the transcript.'
           }
         ]
       }],
-      config: { temperature: 0.2 }
+      config: { temperature: 0.1 }
     });
     const t = response.text?.trim();
-    if (t) console.log(`🎙️  STT result: "${t}"`);
+    if (t) console.log(`🎙️ STT transcription succeeded: "${t}"`);
     return t || null;
   } catch (e) {
-    console.warn('Gemini STT error:', e.message);
-    return null;
+    console.warn('⚠️ Gemini STT error:', e.message);
+    // Try fallback to gemini-1.5-flash if main fails
+    try {
+      const response2 = await aiClient.models.generateContent({
+        model   : 'gemini-1.5-flash',
+        contents: [{
+          role : 'user',
+          parts: [
+            { inlineData: { mimeType: (mimeType || 'audio/ogg').split(';')[0], data: base64Audio } },
+            { text: 'Transcribe this audio note accurately. Output only the transcript.' }
+          ]
+        }]
+      });
+      const t2 = response2.text?.trim();
+      if (t2) console.log(`🎙️ Fallback STT result: "${t2}"`);
+      return t2 || null;
+    } catch (e2) {
+      console.warn('⚠️ Fallback Gemini STT error:', e2.message);
+      return null;
+    }
   }
 }
 
@@ -477,7 +557,10 @@ async function startSocket() {
 
         } else {
           textContent = msg.message.conversation ||
-                        msg.message.extendedTextMessage?.text || '';
+                        msg.message.extendedTextMessage?.text ||
+                        msg.message.buttonsResponseMessage?.selectedDisplayText ||
+                        msg.message.listResponseMessage?.title || '';
+          if (textContent) console.log(`📝 Raw text: "${textContent.slice(0,100)}"`);
         }
 
         // ── B. Build effective text ─────────────────────────────────────────
@@ -489,10 +572,13 @@ async function startSocket() {
           const transcript = await transcribeAudio(mediaB64, mediaMime);
           if (transcript) {
             effectiveText = transcript;
-            console.log(`🎙️  Transcript: "${effectiveText}"`);
+            console.log(`🎙️ Successfully converted Voice Note to order text: "${effectiveText}"`);
           } else {
-            // Gemini unavailable — tell Sarvam it was a voice note it can't hear
-            effectiveText = '[Voice note received — could not transcribe. Please ask the customer to repeat by text.]';
+            console.warn(`⚠️ [Voice Note] Failed to transcribe audio from ${from}. Informing customer.`);
+            await sock.sendMessage(from, {
+              text: `🎙️ Voice note received! Audio transcription requires a valid GEMINI_API_KEY in the bot's .env file. Please type your order items (e.g. "1 coke 2 pizza") or send a photo of your handwritten slip!`
+            });
+            continue;
           }
         }
 
