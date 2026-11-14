@@ -6,7 +6,12 @@ import dotenv from 'dotenv';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-import makeWASocket, { DisconnectReason, useMultiFileAuthState, fetchLatestBaileysVersion } from '@whiskeysockets/baileys';
+import makeWASocket, {
+  DisconnectReason,
+  useMultiFileAuthState,
+  fetchLatestBaileysVersion,
+  downloadMediaMessage
+} from '@whiskeysockets/baileys';
 import { Boom } from '@hapi/boom';
 import qrcode from 'qrcode';
 import pino from 'pino';
@@ -15,7 +20,7 @@ import { GoogleGenAI } from '@google/genai';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Process crash prevention for asynchronous Baileys library events
+// Process crash prevention for asynchronous library events
 process.on('uncaughtException', (err) => {
   console.warn('⚠️ Process uncaughtException intercepted:', err?.message || err);
 });
@@ -24,18 +29,25 @@ process.on('unhandledRejection', (reason) => {
   console.warn('⚠️ Process unhandledRejection intercepted:', reason?.message || reason);
 });
 
-// 1. Load GEMINI_API_KEY from the parent .env file
+// 1. Load Environment Configuration
 dotenv.config({ path: path.join(__dirname, '../.env') });
-// Also load local .env as fallback if present
 dotenv.config({ path: path.join(__dirname, '.env') });
 
 const PORT = 3001;
+const UPI_VPA = process.env.UPI_VPA || process.env.MERCHANT_UPI_ID || 'cafevaidehi.demo@upi';
+const SARVAM_API_KEY = process.env.SARVAM_API_KEY?.trim();
+const SARVAM_AGENT_ID = process.env.SARVAM_AGENT_ID || 'whatsapp-ch-779ea7d0-dd9c';
+const OCR_SPACE_API_KEY = process.env.OCR_SPACE_API_KEY || '51c4e9533888957';
 
-// 2. Setup Express & Socket.IO with CORS enabled for *
+// 2. Setup Express & Socket.IO with CORS
 const app = express();
 app.use(cors({ origin: '*' }));
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+
+// Serve parent storefront website (index.html, designuicss.css, images)
+app.use(express.static(path.join(__dirname, '..')));
+// Also serve dedicated bot control dashboard at /dashboard
+app.use('/dashboard', express.static(path.join(__dirname, 'public')));
 
 const httpServer = http.createServer(app);
 const io = new Server(httpServer, {
@@ -47,11 +59,11 @@ const io = new Server(httpServer, {
 
 // 3. Gemini AI Client Setup
 let aiClient = null;
-const apiKey = process.env.GEMINI_API_KEY?.trim();
-if (apiKey && apiKey !== 'your_api_key_here') {
+const geminiApiKey = process.env.GEMINI_API_KEY?.trim();
+if (geminiApiKey && geminiApiKey !== 'your_api_key_here') {
   try {
-    aiClient = new GoogleGenAI({ apiKey });
-    console.log('✨ Gemini AI Client initialized with model gemini-3-flash-preview');
+    aiClient = new GoogleGenAI({ apiKey: geminiApiKey });
+    console.log('✨ Gemini Multimodal AI Client initialized (model: gemini-3-flash-preview)');
   } catch (err) {
     console.error('Failed to initialize Gemini AI client:', err);
   }
@@ -59,184 +71,509 @@ if (apiKey && apiKey !== 'your_api_key_here') {
   console.log('ℹ️ Notice: GEMINI_API_KEY not configured or placeholder in .env; verified catalog fallback engine active.');
 }
 
-// 4. In-Memory Store & Conversation State
+if (SARVAM_API_KEY) {
+  console.log(`🤖 Sarvam AI Integration configured with Agent ID: ${SARVAM_AGENT_ID}`);
+}
+
+// 4. In-Memory Store & Verified Catalog
 let activeStoreConfig = {
-  storeName: 'Vyapaar Store',
+  storeName: 'Cafe Vaidehi',
   phone: '9876543210',
-  occupation: 'Retail & Commerce',
-  deliveryMode: 'local',
+  occupation: 'Restaurant & Cafe',
+  deliveryMode: 'delivery',
   activeStages: [
-    { stageNum: 'Stage 01', tag: 'Voice Ingestion', title: 'Multilingual Voice STT', desc: 'Parses customer voice notes into items' },
-    { stageNum: 'Stage 02', tag: 'Catalog', title: 'Verified Inventory Sync', desc: 'Locks prices deterministically' },
-    { stageNum: 'Stage 03', tag: 'Payment', title: 'Zero-Fee UPI Link & Pay', desc: 'Generates 1-click WhatsApp Pay link' },
-    { stageNum: 'Stage 04', tag: 'Dispatch', title: 'Local Delivery Dispatch', desc: 'Alerts rider with buyer landmark' }
+    { stageNum: 'Stage 01', tag: 'Voice Ingestion', title: 'Multilingual Voice STT', desc: 'Parses customer voice notes into dishes & units' },
+    { stageNum: 'Stage 02', tag: 'Visual Menu', title: 'Visual Food Card Broadcast', desc: 'Dispatches dish photos with prices' },
+    { stageNum: 'Stage 03', tag: 'Catalog Lock', title: 'Verified Menu Sync & My Usual', desc: 'Locks prices strictly to verified catalog' },
+    { stageNum: 'Stage 04', tag: 'UPI Tap-to-Pay', title: 'Dynamic UPI QR & Deep Link', desc: 'Generates 1-click tap-to-pay link' },
+    { stageNum: 'Stage 05', tag: 'Dispatch', title: '5km Local Delivery Dispatch', desc: 'Confirms address within 5km radius' }
   ],
   catalog: [
-    { name: 'Paneer Tikka Pizza (10-inch)', cat: 'Woodfired Pizza', price: 349, stock: 'Ready to Fire' },
-    { name: 'Dum Murgh Biryani (Handi)', cat: 'Biryanis & Rice', price: 389, stock: 'Ready to Fire' },
-    { name: 'Crispy Chilli Babycorn', cat: 'Starters & Appetizers', price: 210, stock: 'Ready to Fire' },
-    { name: 'Dal Makhani (Slow Cooked)', cat: 'Main Course', price: 260, stock: 'Ready to Fire' },
-    { name: 'Gulab Jamun (2 Pieces)', cat: 'Desserts', price: 80, stock: 'In Kitchen' },
-    { name: 'Diet Coke Can (300ml)', cat: 'Beverages', price: 40, stock: 'Chilled (30)' }
+    {
+      name: 'Paneer Tikka Pizza (10-inch)',
+      cat: 'Woodfired Pizza',
+      price: 349,
+      stock: 'Ready to Fire',
+      image: 'images/pizza.jpg'
+    },
+    {
+      name: 'Dum Murgh Biryani (Handi)',
+      cat: 'Biryanis & Rice',
+      price: 389,
+      stock: 'Ready to Fire',
+      image: 'images/biryani.jpg'
+    },
+    {
+      name: 'Crispy Chilli Babycorn',
+      cat: 'Starters & Appetizers',
+      price: 210,
+      stock: 'Ready to Fire',
+      image: 'images/babycorn.jpg'
+    },
+    {
+      name: 'Dal Makhani (Slow Cooked)',
+      cat: 'Main Course',
+      price: 260,
+      stock: 'Ready to Fire',
+      image: 'images/dal.jpg'
+    },
+    {
+      name: 'Gulab Jamun (2 Pieces)',
+      cat: 'Desserts',
+      price: 80,
+      stock: 'In Kitchen',
+      image: 'images/gulabjamun.jpg'
+    },
+    {
+      name: 'Diet Coke Can (300ml)',
+      cat: 'Beverages',
+      price: 40,
+      stock: 'Chilled (30)',
+      image: 'images/coke.jpg'
+    }
   ]
 };
 
-// Per-sender conversation history: Map<remoteJid, Array<{ role: 'user' | 'model', parts: [{ text: string }] }>>
-const conversationMemory = new Map();
-const MAX_MEMORY_TURNS = 12;
+// 5. Persistent Customer State & Memory Store
+const customerStore = new Map();
 
-function getSenderHistory(jid) {
-  if (!conversationMemory.has(jid)) {
-    conversationMemory.set(jid, []);
+function getCustomer(jid) {
+  const phone = jid.split('@')[0];
+  if (!customerStore.has(phone)) {
+    customerStore.set(phone, {
+      phone,
+      orderSession: {
+        status: 'IDLE', // 'IDLE' | 'COLLECTING' | 'AWAITING_CONFIRMATION' | 'AWAITING_ADDRESS'
+        cart: [],       // Array<{ name: string, price: number, qty: number }>
+        address: null
+      },
+      usualOrder: null,
+      lastOrder: null,
+      complaints: [],
+      history: []
+    });
   }
-  return conversationMemory.get(jid);
+  const cust = customerStore.get(phone);
+  if (!cust.orderSession) {
+    cust.orderSession = { status: 'IDLE', cart: [], address: null };
+  }
+  return cust;
 }
 
-function recordTurn(jid, userText, botReply) {
-  const history = getSenderHistory(jid);
-  history.push({ role: 'user', parts: [{ text: userText }] });
-  history.push({ role: 'model', parts: [{ text: botReply }] });
-  if (history.length > MAX_MEMORY_TURNS * 2) {
-    history.splice(0, history.length - MAX_MEMORY_TURNS * 2);
-  }
+// Unique Order ID Generator: "CV" + 4 digits (e.g. CV1042)
+let orderCounter = Math.floor(1000 + Math.random() * 9000);
+function generateOrderId() {
+  orderCounter++;
+  if (orderCounter > 9999) orderCounter = 1000;
+  return `CV${orderCounter}`;
 }
 
-// 5. Build Dynamic Gemini System Instruction
-function buildSystemInstruction(storeConfig) {
-  const storeName = storeConfig.storeName || 'Vyapaar Store';
-  const occupation = storeConfig.occupation || 'Store';
-  const deliveryMode = storeConfig.deliveryMode || 'local';
-  
-  const fulfillmentDesc = deliveryMode === 'local'
-    ? '🛵 Local Delivery: Dispatched via in-house rider within 5km (estimated 30-45 minutes).'
-    : deliveryMode === 'pickup'
-      ? '🛍️ Store Pickup: Customer collects order directly at store counter.'
-      : '📦 Courier Dispatch: Surface shipping with tracking across India.';
+// 6. Robust Dynamic Item Aliases & Number Words Mapping
+const KNOWN_ALIASES = {
+  pizza: ['paneer tikka pizza', 'tikka pizza', 'paneer pizza', 'pizza', 'pizzas'],
+  biryani: ['dum murgh biryani', 'murgh biryani', 'chicken biryani', 'dum biryani', 'biryani', 'biriyani', 'biryanis'],
+  babycorn: ['crispy chilli babycorn', 'chilli babycorn', 'chilli baby corn', 'babycorn', 'baby corn'],
+  dal: ['dal makhani', 'daal makhani', 'makhani dal', 'dal', 'daal', 'makhani'],
+  gulabjamun: ['gulab jamun', 'gulabjamun', 'jamun', 'gulab jamuns'],
+  coke: ['diet coke', 'coca cola', 'cocacola', 'coke', 'cold drink', 'cokes', 'cola'],
+  milk: ['amul taaza milk', 'toned milk', 'amul milk', 'milk', 'doodh'],
+  atta: ['aashirvaad chakki atta', 'chakki atta', 'aashirvaad atta', 'atta', 'flour', 'aata'],
+  salt: ['tata iodized salt', 'tata salt', 'salt', 'namak'],
+  oil: ['fortune sunlite oil', 'refined oil', 'fortune oil', 'sunflower oil', 'cooking oil', 'oil', 'tel'],
+  coffee: ['bru instant coffee', 'bru coffee', 'instant coffee', 'coffee'],
+  rice: ['india gate basmati rice', 'basmati rice', 'india gate rice', 'rice', 'chawal']
+};
 
-  const catalogStr = (storeConfig.catalog || []).map((item, idx) => 
-    `${idx + 1}. ${item.name} (${item.cat || 'General'}) — ₹${item.price} [${item.stock || 'In Stock'}]`
-  ).join('\n');
+function getItemAliases(item) {
+  const set = new Set();
+  const lowerName = (item.name || '').toLowerCase();
+  set.add(lowerName);
 
-  const stagesStr = (storeConfig.activeStages || []).map(st => 
-    `- [${st.stageNum || ''}] ${st.title}: ${st.desc}`
-  ).join('\n');
-
-  return `You are the official WhatsApp AI Shopping and Ordering Assistant for "${storeName}", an Indian ${occupation}.
-You are interacting directly with customers inside WhatsApp.
-
-STORE OPERATING DETAILS:
-- Merchant Name: ${storeName}
-- Business Type: ${occupation}
-- Fulfillment Model: ${fulfillmentDesc}
-- Active Store Workflow Stages:
-${stagesStr}
-
-STRICT VERIFIED CATALOG & PRICES (IN ₹ INR):
-${catalogStr}
-
-CORE BEHAVIOR RULES:
-1. GREETING & TONE: Greet customers warmly and naturally in English or conversational Indian Hinglish (e.g., "Namaste!", "Welcome to ${storeName}! How can I help you today?"). Match the customer's language.
-2. STRICT CATALOG ACCURACY: YOU MUST ONLY RECOMMEND, QUOTE, AND CONFIRM ITEMS AND PRICES THAT APPEAR IN THE VERIFIED CATALOG ABOVE. Do not invent products or offer arbitrary discounts.
-3. MENU / CATALOG BROWSING: When asked for the menu, prices, or options, present them clearly with clean emojis, categories, and exact ₹ prices.
-4. ORDER TAKING & TOTAL CALCULATION:
-   - When the customer indicates what they want, verify the item name and quantity.
-   - Calculate the exact total price in ₹ (sum of item prices * quantity).
-   - Ask for their delivery address / landmark and recipient phone number if not already provided.
-   - Summarize the final order: list the items, total in ₹, delivery mode (${deliveryMode}), and inform them that their order has been locked and a 1-click UPI payment link is ready.
-5. CONCISE & MOBILE OPTIMIZED: Keep replies concise, polite, well-structured, and easy to read on mobile screens using WhatsApp Markdown (*bold*, bullet points).
-6. Never break character. Always represent ${storeName} with warmth and reliability.`;
-}
-
-// 6. Conversational Fallback Engine (when Gemini API key is unset or network error)
-function generateFallbackReply(userText, storeConfig) {
-  const text = (userText || '').toLowerCase();
-  const storeName = storeConfig.storeName || 'Vyapaar Store';
-  const catalog = storeConfig.catalog || [];
-
-  if (text.includes('hi') || text.includes('hello') || text.includes('namaste') || text.includes('hey')) {
-    const previewList = catalog.slice(0, 3).map(i => `• *${i.name}* - ₹${i.price}`).join('\n');
-    return `Namaste! Welcome to *${storeName}* on WhatsApp 🙏\n\nHow can I help you today? Here are some of our popular items:\n${previewList}\n\nType *Menu* to see all items, or tell me what you'd like to order!`;
+  if (Array.isArray(item.aliases)) {
+    item.aliases.forEach(a => set.add(a.toLowerCase()));
   }
 
-  if (text.includes('menu') || text.includes('catalog') || text.includes('list') || text.includes('price') || text.includes('item')) {
-    const fullList = catalog.map((item, idx) => `*${idx + 1}. ${item.name}*\n   Category: ${item.cat || 'General'} | Price: *₹${item.price}* (${item.stock || 'In Stock'})`).join('\n\n');
-    return `📋 *${storeName} — Verified Catalog*\n\n${fullList}\n\nTo place an order, just reply with the item name or number!`;
-  }
+  // Clean parentheses like "(10-inch)", "(300ml)", "(Handi)"
+  const cleanedName = lowerName.replace(/\(.*?\)/g, '').trim();
+  if (cleanedName) set.add(cleanedName);
 
-  // Check if user requested an item from catalog
-  for (const item of catalog) {
-    const itemWords = item.name.toLowerCase().split(' ').filter(w => w.length > 3);
-    const matched = itemWords.some(w => text.includes(w));
-    if (matched) {
-      const mode = storeConfig.deliveryMode === 'local' ? '🛵 Local delivery within 5km' : '🛍️ Store takeaway';
-      return `Great choice! I have noted *${item.name}* (₹${item.price}) for you.\n\n• Price: *₹${item.price}*\n• Fulfillment: *${mode}*\n\nPlease reply with your delivery address / landmark and quantity to confirm your order!`;
+  // Match known aliases database
+  for (const [key, aliasList] of Object.entries(KNOWN_ALIASES)) {
+    if (lowerName.includes(key) || aliasList.some(a => lowerName.includes(a))) {
+      aliasList.forEach(a => set.add(a));
     }
   }
 
-  if (text.includes('order') || text.includes('buy') || text.includes('deliver') || text.includes('address')) {
-    return `Thank you! Your order is being processed by *${storeName}*.\n\nOur delivery team is notified. A secure zero-fee UPI payment link is generated for your checkout. Reply with any special instructions or additional items!`;
-  }
+  // Add individual significant words (>=3 letters)
+  const words = cleanedName.split(/[\s,]+/).filter(w => w.length >= 3);
+  words.forEach(w => set.add(w));
 
-  // Default natural response
-  return `Thank you for messaging *${storeName}*! We have received your request. You can browse our verified catalog by typing *Menu*, or let us know which items you would like to order today.`;
+  return [...set].sort((a, b) => b.length - a.length);
 }
 
-// 7. Generate Response using Gemini 3 Flash Preview (with Fallback)
-async function callGemini(jid, userText, storeConfig) {
-  const history = getSenderHistory(jid);
-  const systemInstruction = buildSystemInstruction(storeConfig);
+function getItemDisplayName(fullName) {
+  const lower = (fullName || '').toLowerCase();
+  if (lower.includes('coke') || lower.includes('cola')) return 'Coke';
+  if (lower.includes('pizza')) return 'Pizza';
+  if (lower.includes('biryani') || lower.includes('biriyani')) return 'Biryani';
+  if (lower.includes('babycorn') || lower.includes('baby corn')) return 'Chilli Babycorn';
+  if (lower.includes('dal') || lower.includes('daal')) return 'Dal Makhani';
+  if (lower.includes('jamun') || lower.includes('gulab')) return 'Gulab Jamun';
+  return fullName.replace(/\(.*?\)/g, '').trim();
+}
+
+const WORD_NUMBERS = {
+  'a': 1, 'an': 1, 'one': 1, 'ek': 1,
+  'two': 2, 'do': 2,
+  'three': 3, 'teen': 3,
+  'four': 4, 'char': 4, 'chaar': 4,
+  'five': 5, 'panch': 5, 'paanch': 5,
+  'six': 6, 'che': 6,
+  'seven': 7, 'saat': 7,
+  'eight': 8, 'aath': 8,
+  'nine': 9, 'nau': 9,
+  'ten': 10, 'das': 10
+};
+
+function extractOrderItems(rawText, catalogList) {
+  const text = (rawText || '').toLowerCase();
+  const matched = [];
+  const catalog = catalogList || activeStoreConfig.catalog;
+
+  for (const catItem of catalog) {
+    const aliases = getItemAliases(catItem);
+
+    for (const alias of aliases) {
+      const regex = new RegExp('(?:^|\\s|[0-9])' + alias + '(?:$|\\s|[0-9]|\'|s|es)', 'i');
+      const idx = text.search(regex);
+      if (idx !== -1 || text.includes(alias)) {
+        const foundIdx = idx !== -1 ? idx : text.indexOf(alias);
+        let qty = 1;
+        const prefix = text.substring(Math.max(0, foundIdx - 25), foundIdx).trim();
+        const numMatch = prefix.match(/(\d+)\s*(?:x|\*|plate|plates|portion|portions|can|cans|piece|pieces|bottle|bottles)?\s*$/);
+        if (numMatch) {
+          qty = parseInt(numMatch[1], 10);
+        } else {
+          const wordMatch = prefix.match(/\b(a|an|one|two|three|four|five|six|seven|eight|nine|ten|ek|do|teen|char|chaar|panch|che|saat|aath|nau|das)\s*(?:x|\*|plate|plates|portion|portions|can|cans|piece|pieces|bottle|bottles)?\s*$/);
+          if (wordMatch && WORD_NUMBERS[wordMatch[1]]) {
+            qty = WORD_NUMBERS[wordMatch[1]];
+          }
+        }
+        matched.push({ name: catItem.name, price: catItem.price, qty });
+        break;
+      }
+    }
+  }
+  return matched;
+}
+
+function addToCart(session, items) {
+  for (const item of items) {
+    const existing = session.cart.find(i => i.name === item.name);
+    if (existing) {
+      existing.qty += item.qty;
+    } else {
+      session.cart.push({ ...item });
+    }
+  }
+}
+
+function getCartTotal(cart) {
+  return cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+}
+
+function formatItemizedBill(cart, storeName) {
+  const total = getCartTotal(cart);
+  const itemsText = cart.map(i => {
+    const displayName = getItemDisplayName(i.name);
+    const lineTotal = i.price * i.qty;
+    return `• ${displayName} (${i.qty}x) - ${lineTotal}rs`;
+  }).join('\n');
+
+  return `🧾 *${storeName || 'Cafe Vaidehi'} Order Bill*\n─────────────────────\n${itemsText}\n─────────────────────\n💰 *Total Amount: ${total}rs*`;
+}
+
+// 7. Dynamic System Instruction (Cafe Vaidehi + Sarvam Spec)
+function buildSystemInstruction(storeConfig, customer) {
+  const storeName = storeConfig.storeName || 'Cafe Vaidehi';
+
+  const catalogList = (storeConfig.catalog || []).map((item) =>
+    `- ${item.name} (${item.cat || 'Special'}): ₹${item.price} [${item.stock || 'Available'}]`
+  ).join('\n');
+
+  const usualSummary = customer?.usualOrder
+    ? `Customer's saved Usual Order: ${customer.usualOrder.items.map(i => `${i.qty}x ${i.name}`).join(', ')} (Total ₹${customer.usualOrder.totalAmount})`
+    : 'No usual order saved yet for this customer.';
+
+  const currentCartSummary = customer?.orderSession?.cart?.length > 0
+    ? `Current Cart Items: ${customer.orderSession.cart.map(i => `${i.qty}x ${i.name} (₹${i.price * i.qty})`).join(', ')}. Subtotal: ₹${getCartTotal(customer.orderSession.cart)}`
+    : 'Cart is currently empty.';
+
+  return `## Persona
+You are the official WhatsApp assistant for "${storeName}". You help customers order food, book tables, ask about the menu, follow up on orders, and raise complaints. When asked whether you are AI, state that you are ${storeName}'s virtual assistant and that a team member can step in whenever needed.
+
+## Speaking Style Rules
+- Messages are short, warm, and natural (1 or 2 sentences maximum).
+- Ask only ONE question at a time, then stop and wait for the customer's answer.
+- Replies MUST match the exact language and script the customer writes or speaks in (English, Hindi, Marathi, Hinglish, etc.).
+- Never recite long unstructured lists.
+
+## Cafe Facts & Policies
+- ${storeName} is open daily from 11:00 AM to 10:00 PM.
+- Home delivery is available strictly within 5 km. Customers can also pick up at the cafe.
+- Payment is accepted by UPI, cards, and cash on delivery.
+- Refunds are available only for orders cancelled before food preparation starts.
+- Vegetarian meals and freshly prepared dishes are available.
+
+## STRICT VERIFIED MENU & EXACT PRICES (IN ₹ INR):
+${catalogList}
+
+## STRICT OUT-OF-MENU GUARDRAIL & ALTERNATIVES:
+- You must NEVER invent, agree to, or confirm items outside the verified menu above.
+- If a customer asks for an item not in the verified menu (e.g. burgers, pasta, noodles, sushi, sandwich, etc.), politely decline: "Sorry, [item] isn't available with us right now." and immediately suggest 2–3 closest available items from our menu with their prices.
+
+## CURRENT CART STATE:
+${currentCartSummary}
+
+## "ORDER MY USUAL" LOGIC:
+${usualSummary}
+- When a customer says "order my usual", "the usual", or similar:
+  - If they have a saved usual order, read back the items, quantities, and total bill in one short message and ask for confirmation.
+  - If their usual order is not known, say so briefly, ask what they would like today, and tell them you will remember it as their usual for next time.
+
+## RESERVATIONS:
+Collect date, time, number of guests, and contact name, then repeat back and confirm.
+
+## COMPLAINTS:
+Acknowledge, collect order details and what went wrong, state that the cafe team will follow up. Never promise refunds beyond policy.`;
+}
+
+// 8. UPI Link and Dynamic QR Code Generator
+function buildUpiUri(orderId, amountDigits, storeName) {
+  const cleanAmount = String(amountDigits).replace(/[^0-9.]/g, '');
+  return `upi://pay?pa=${UPI_VPA}&pn=${encodeURIComponent(storeName || 'Cafe Vaidehi')}&am=${cleanAmount}&tn=${orderId}`;
+}
+
+async function generateUpiQrBuffer(upiUri) {
+  return await qrcode.toBuffer(upiUri, {
+    width: 400,
+    margin: 2,
+    color: {
+      dark: '#0A3622',
+      light: '#FFFFFF'
+    }
+  });
+}
+
+// 8.1. tool:read_photo_text via OCR.space API (Key: 51c4e9533888957)
+async function readPhotoTextWithOCRSpace(buffer, mimeType) {
+  try {
+    const base64 = `data:${mimeType || 'image/jpeg'};base64,${buffer.toString('base64')}`;
+    const formData = new FormData();
+    formData.append('apikey', OCR_SPACE_API_KEY);
+    formData.append('base64Image', base64);
+    formData.append('isOverlayRequired', 'false');
+
+    console.log(`🔍 [tool:read_photo_text] Submitting image buffer to OCR.space...`);
+    const res = await fetch('https://api.ocr.space/parse/image', {
+      method: 'POST',
+      body: formData
+    });
+    const data = await res.json();
+    if (data && data.ParsedResults && data.ParsedResults.length > 0) {
+      const text = data.ParsedResults[0].ParsedText?.trim();
+      if (text) {
+        console.log(`✅ [tool:read_photo_text] Extracted ${text.length} characters of OCR text: "${text.slice(0, 80)}..."`);
+        return text;
+      }
+    }
+  } catch (err) {
+    console.warn('⚠️ [tool:read_photo_text] OCR.space API call failed:', err.message);
+  }
+  return null;
+}
+
+// 9. Visual Menu Cards Broadcast
+async function sendVisualMenuCards(sock, from, catalog, storeName) {
+  const imagesDir = path.resolve(__dirname, '../images');
+  console.log(`📸 Broadcasting visual menu cards to ${from}...`);
+
+  for (const item of catalog) {
+    let imageBuffer = null;
+    if (item.image) {
+      const fileName = path.basename(item.image);
+      const fullPath = path.join(imagesDir, fileName);
+      if (fs.existsSync(fullPath)) {
+        try {
+          imageBuffer = fs.readFileSync(fullPath);
+        } catch (e) {
+          console.error(`Could not read image file for ${item.name}:`, e.message);
+        }
+      }
+    }
+
+    const caption = `🍽️ *${item.name}*\n🏷️ Category: ${item.cat || 'Special'} | 💰 *₹${item.price}*\n⚡ Status: _${item.stock || 'Ready to Fire'}_`;
+
+    try {
+      if (imageBuffer) {
+        await sock.sendMessage(from, { image: imageBuffer, caption });
+      } else {
+        await sock.sendMessage(from, { text: caption });
+      }
+    } catch (sendErr) {
+      console.error(`Error sending card for ${item.name}:`, sendErr.message);
+    }
+
+    await new Promise(r => setTimeout(r, 200));
+  }
+
+  await sock.sendMessage(from, {
+    text: `Here is our current visual menu at *${storeName || 'Cafe Vaidehi'}*! 🍽️\n\nWhat would you like to order today? You can reply with items (e.g. "1 coke" or "2 biryani") or send a voice note!`
+  });
+}
+
+// 10. Sarvam AI Agent Integration
+async function callSarvamAgent(userText, customer) {
+  if (!SARVAM_API_KEY) return null;
+
+  try {
+    console.log(`🤖 Routing message to Sarvam AI Agent (${SARVAM_AGENT_ID})...`);
+    const res = await fetch(`https://api.sarvam.ai/v1/agents/${SARVAM_AGENT_ID}/chat`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'api-subscription-key': SARVAM_API_KEY
+      },
+      body: JSON.stringify({
+        message: userText,
+        session_id: customer.phone
+      })
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      const reply = data.reply || data.response || data.message || data.output;
+      if (reply) return reply.trim();
+    } else {
+      console.warn(`Sarvam AI returned status ${res.status}. Falling back to Gemini...`);
+    }
+  } catch (err) {
+    console.warn('Sarvam API call failed:', err.message);
+  }
+  return null;
+}
+
+// 11. Conversational Fallback Engine
+function generateFallbackReply(userText, storeConfig, customer) {
+  const text = (userText || '').toLowerCase();
+  const storeName = storeConfig.storeName || 'Cafe Vaidehi';
+  const catalog = storeConfig.catalog || [];
+
+  // Greetings
+  if (text.includes('hi') || text.includes('hello') || text.includes('namaste') || text.includes('hey')) {
+    return `Namaste! Welcome to *${storeName}* 🙏 How can I help you today: would you like to order food, book a table, or view our menu?`;
+  }
+
+  // Table Reservation
+  if (text.includes('table') || text.includes('reserve') || text.includes('booking')) {
+    return `We would be happy to host you! Could you please share the date, time, number of guests, and your name?`;
+  }
+
+  // Complaints
+  if (text.includes('complaint') || text.includes('wrong') || text.includes('late') || text.includes('bad') || text.includes('cold')) {
+    return `I am truly sorry to hear that. Could you share your order ID or details of what went wrong? Our cafe team will follow up directly.`;
+  }
+
+  // Out-of-menu item requested
+  const outOfMenuItems = ['burger', 'pasta', 'noodles', 'sushi', 'taco', 'sandwich', 'ice cream', 'roti', 'dosa', 'idli'];
+  for (const oom of outOfMenuItems) {
+    if (text.includes(oom)) {
+      const suggestions = catalog.slice(0, 3).map(i => `• *${i.name}* (₹${i.price})`).join('\n');
+      return `Sorry, ${oom} is not available with us right now. Would you like to try something from our fresh specialties?\n${suggestions}`;
+    }
+  }
+
+  return `Welcome to *${storeName}*! You can browse our visual menu, tell me what you'd like to eat, or say "order my usual"!`;
+}
+
+// 12. Multimodal Processor (Voice STT, Vision OCR & Text via Gemini 3 Flash)
+async function processWithGemini(jid, incomingMedia, textInput, storeConfig) {
+  const customer = getCustomer(jid);
+  const systemInstruction = buildSystemInstruction(storeConfig, customer);
 
   if (aiClient) {
     try {
-      console.log(`🤖 Invoking Gemini (gemini-3-flash-preview) for ${jid}...`);
+      const parts = [];
+
+      // Voice Note Audio
+      if (incomingMedia?.type === 'audio') {
+        console.log(`🎙️ Transcribing voice note via Gemini 3 Flash (${incomingMedia.mimeType})...`);
+        parts.push({
+          inlineData: {
+            mimeType: incomingMedia.mimeType.split(';')[0] || 'audio/ogg',
+            data: incomingMedia.base64
+          }
+        });
+        parts.push({
+          text: "The customer sent this WhatsApp voice note. Transcribe and reply in the EXACT same language and script they spoke in. Be concise (1-2 sentences) and follow all Cafe Vaidehi rules."
+        });
+      }
+      // Photo / Slip OCR
+      else if (incomingMedia?.type === 'image') {
+        console.log(`🖼️ Processing image via Gemini Vision...`);
+        parts.push({
+          inlineData: {
+            mimeType: incomingMedia.mimeType || 'image/jpeg',
+            data: incomingMedia.base64
+          }
+        });
+        const ocrNote = incomingMedia.ocrText ? `tool:read_photo_text OCR extracted text: "${incomingMedia.ocrText}". ` : '';
+        parts.push({
+          text: (textInput ? `Customer caption: "${textInput}". ` : "") + ocrNote +
+            "The customer sent this photo of an order, handwritten dish list, or menu. Match the items strictly with our verified catalog and list them with quantities."
+        });
+      }
+      // Text
+      else {
+        parts.push({ text: textInput });
+      }
+
+      const history = customer.history.slice(-6);
+
       const response = await aiClient.models.generateContent({
         model: 'gemini-3-flash-preview',
         contents: [
           ...history,
-          { role: 'user', parts: [{ text: userText }] }
+          { role: 'user', parts }
         ],
         config: {
           systemInstruction,
-          temperature: 0.7
+          temperature: 0.6
         }
       });
 
       const reply = response.text?.trim();
       if (reply) {
-        recordTurn(jid, userText, reply);
+        customer.history.push({ role: 'user', parts: [{ text: textInput || '[Voice/Photo Message]' }] });
+        customer.history.push({ role: 'model', parts: [{ text: reply }] });
+        if (customer.history.length > 12) customer.history.splice(0, customer.history.length - 12);
         return reply;
       }
     } catch (err) {
-      console.warn('Gemini 3 Flash call failed, attempting gemini-2.5-flash fallback:', err.message);
-      try {
-        const response = await aiClient.models.generateContent({
-          model: 'gemini-2.5-flash',
-          contents: [
-            ...history,
-            { role: 'user', parts: [{ text: userText }] }
-          ],
-          config: {
-            systemInstruction,
-            temperature: 0.7
-          }
-        });
-        const reply = response.text?.trim();
-        if (reply) {
-          recordTurn(jid, userText, reply);
-          return reply;
-        }
-      } catch (err2) {
-        console.warn('Gemini 2.5 Flash fallback also failed:', err2.message);
-      }
+      console.warn('Gemini 3 Flash call failed:', err.message);
     }
   }
 
-  const fallback = generateFallbackReply(userText, storeConfig);
-  recordTurn(jid, userText, fallback);
-  return fallback;
+  // Sarvam AI fallback
+  if (!incomingMedia && SARVAM_API_KEY) {
+    const sarvamReply = await callSarvamAgent(textInput, customer);
+    if (sarvamReply) return sarvamReply;
+  }
+
+  return generateFallbackReply(textInput, storeConfig, customer);
 }
 
-// 8. Baileys Multi-Device WhatsApp Socket Manager
+// 13. Baileys Multi-Device WhatsApp Socket Manager
 const authPath = path.join(__dirname, 'auth_info');
 if (!fs.existsSync(authPath)) {
   fs.mkdirSync(authPath, { recursive: true });
@@ -264,7 +601,7 @@ async function startWhatsAppSocket() {
       logger: pino({ level: 'silent' }),
       printQRInTerminal: false,
       auth: state,
-      browser: ['Vyapaar Storefront', 'Chrome', '120.0.0'],
+      browser: ['Cafe Vaidehi WhatsApp Bot', 'Chrome', '120.0.0'],
       syncFullHistory: false,
       generateHighQualityLinkPreview: false,
       markOnlineOnConnect: true,
@@ -329,7 +666,7 @@ async function startWhatsAppSocket() {
       }
     });
 
-    // Handle inbound customer messages
+    // Inbound customer message router
     sock.ev.on('messages.upsert', async ({ messages, type }) => {
       if (type !== 'notify') return;
 
@@ -337,22 +674,261 @@ async function startWhatsAppSocket() {
         if (!msg.message || msg.key.fromMe) continue;
 
         const from = msg.key.remoteJid;
-        const text = msg.message.conversation ||
-                     msg.message.extendedTextMessage?.text ||
-                     msg.message.imageMessage?.caption || '';
+        const customer = getCustomer(from);
+        const session = customer.orderSession;
+        const storeName = activeStoreConfig.storeName || 'Cafe Vaidehi';
 
-        if (!text.trim()) continue;
+        let incomingMedia = null;
+        let textContent = '';
 
-        console.log(`📩 [WhatsApp] Message from ${from}: "${text}"`);
+        // 1. Detect Voice Note (Audio)
+        if (msg.message?.audioMessage) {
+          try {
+            console.log(`🎙️ Inbound Voice Note from ${from}...`);
+            const buffer = await downloadMediaMessage(
+              msg,
+              'buffer',
+              {},
+              { logger: pino({ level: 'silent' }), reuploadRequest: sock.updateMediaMessage }
+            );
+            incomingMedia = {
+              type: 'audio',
+              base64: buffer.toString('base64'),
+              mimeType: msg.message.audioMessage.mimetype || 'audio/ogg; codecs=opus'
+            };
+          } catch (mediaErr) {
+            console.error('Failed to download audio message:', mediaErr.message);
+          }
+        }
+        // 2. Detect Photo (Image / Handwritten slip)
+        else if (msg.message?.imageMessage) {
+          try {
+            console.log(`📷 Inbound Photo from ${from}...`);
+            const buffer = await downloadMediaMessage(
+              msg,
+              'buffer',
+              {},
+              { logger: pino({ level: 'silent' }), reuploadRequest: sock.updateMediaMessage }
+            );
+            const mimeType = msg.message.imageMessage.mimetype || 'image/jpeg';
 
-        // Generate response using Gemini with dynamic store context
-        const botReply = await callGemini(from, text, activeStoreConfig);
-        console.log(`📤 [WhatsApp] Replying to ${from}: "${botReply.slice(0, 100)}..."`);
+            // Call tool:read_photo_text with OCR.space
+            const ocrExtractedText = await readPhotoTextWithOCRSpace(buffer, mimeType);
 
+            incomingMedia = {
+              type: 'image',
+              base64: buffer.toString('base64'),
+              mimeType,
+              ocrText: ocrExtractedText
+            };
+            textContent = msg.message.imageMessage.caption || '';
+          } catch (mediaErr) {
+            console.error('Failed to download image message:', mediaErr.message);
+          }
+        }
+        // 3. Text Message
+        else {
+          textContent = msg.message.conversation ||
+                        msg.message.extendedTextMessage?.text || '';
+        }
+
+        if (!incomingMedia && !textContent.trim()) continue;
+
+        // If voice note was received, process through Gemini to get audio transcription
+        let effectiveText = textContent.trim();
+        if (incomingMedia?.type === 'audio') {
+          try {
+            const voiceTranscription = await processWithGemini(from, incomingMedia, '', activeStoreConfig);
+            if (voiceTranscription) {
+              console.log(`🎙️ [Voice STT] Decoded audio message: "${voiceTranscription}"`);
+              effectiveText = voiceTranscription;
+            }
+          } catch (sttErr) {
+            console.warn('Voice transcription error:', sttErr.message);
+          }
+        } else if (incomingMedia?.type === 'image' && incomingMedia.ocrText) {
+          effectiveText = (effectiveText + ' ' + incomingMedia.ocrText).trim();
+        }
+
+        console.log(`📩 [WhatsApp] Inbound from ${from} [State: ${session.status}]: "${effectiveText}"`);
+
+        const lowerText = effectiveText.toLowerCase();
+
+        // =========================================================================
+        // STATE 1: AWAITING_ADDRESS -> Generate Bill, Order ID & Pre-Fed UPI QR
+        // =========================================================================
+        if (session.status === 'AWAITING_ADDRESS' && effectiveText.length > 3) {
+          session.address = effectiveText;
+          const orderId = generateOrderId();
+          const totalAmount = getCartTotal(session.cart);
+
+          // Save to customer memory (usualOrder + lastOrder)
+          customer.lastOrder = {
+            orderId,
+            items: [...session.cart],
+            totalAmount,
+            mode: 'delivery',
+            address: session.address,
+            payment: 'UPI',
+            status: 'confirmed',
+            timestamp: new Date()
+          };
+          customer.usualOrder = {
+            items: [...session.cart],
+            totalAmount,
+            timestamp: new Date()
+          };
+          console.log(`💾 Saved Order ${orderId} as usual order for ${customer.phone}! Total: ${totalAmount}rs`);
+
+          // Generate dynamic UPI URI with pre-fed bill values:
+          const upiUri = buildUpiUri(orderId, totalAmount, storeName);
+          const qrBuffer = await generateUpiQrBuffer(upiUri);
+
+          const itemsFormatted = session.cart.map(i => {
+            const displayName = getItemDisplayName(i.name);
+            const lineTotal = i.price * i.qty;
+            return `• ${displayName} (${i.qty}x) - ${lineTotal}rs`;
+          }).join('\n');
+
+          const qrCaption = `Tap here to pay ${totalAmount}rs for order ${orderId}:\n${upiUri}\n\n🧾 *Order ${orderId} Receipt*\n📍 *Delivery Address:* ${session.address}\n─────────────────────\n${itemsFormatted}\n─────────────────────\n💰 *Total to Pay: ${totalAmount}rs*\n\nScan the QR code above with any UPI app (GPay, PhonePe, Paytm). Our kitchen is firing your fresh order! 🚀`;
+
+          try {
+            await sock.sendMessage(from, {
+              image: qrBuffer,
+              caption: qrCaption
+            });
+            console.log(`💳 Dispatched dynamic UPI QR code for Order ${orderId} (${totalAmount}rs) to ${from}`);
+          } catch (qrErr) {
+            console.error('Failed to send UPI QR image:', qrErr.message);
+            await sock.sendMessage(from, { text: qrCaption });
+          }
+
+          // Reset cart session to IDLE
+          session.status = 'IDLE';
+          session.cart = [];
+          session.address = null;
+          continue;
+        }
+
+        // =========================================================================
+        // STATE 2: AWAITING_CONFIRMATION -> Check if user confirms order
+        // =========================================================================
+        const isConfirmIntent = /\b(yes|confirm|confirmed|haan|ha|sahi|sahi hai|ok|okay|sure|proceed|right|bilkul|correct)\b/i.test(lowerText);
+        if (session.status === 'AWAITING_CONFIRMATION' && isConfirmIntent) {
+          session.status = 'AWAITING_ADDRESS';
+          await sock.sendMessage(from, {
+            text: `Order confirmed! 🛵\n\nPlease share your complete delivery address (and nearby landmark) for delivery within 5 km:`
+          });
+          continue;
+        }
+
+        // =========================================================================
+        // STATE 3: Visual Menu Cards Request
+        // =========================================================================
+        const isMenuQuery = !incomingMedia && (
+          lowerText === 'menu' ||
+          lowerText === 'catalog' ||
+          lowerText.includes('show menu') ||
+          lowerText.includes('show dishes') ||
+          lowerText.includes("what's the menu") ||
+          lowerText.includes("what's there to eat") ||
+          lowerText.includes('kya milega') ||
+          lowerText.includes('menu card')
+        );
+
+        if (isMenuQuery) {
+          await sendVisualMenuCards(sock, from, activeStoreConfig.catalog, storeName);
+          continue;
+        }
+
+        // =========================================================================
+        // STATE 4: "ORDER MY USUAL"
+        // =========================================================================
+        const isUsualIntent = /\b(usual|my usual|same as last|same order)\b/i.test(lowerText);
+        if (isUsualIntent) {
+          if (customer?.usualOrder && customer.usualOrder.items?.length > 0) {
+            session.cart = JSON.parse(JSON.stringify(customer.usualOrder.items));
+            session.status = 'AWAITING_CONFIRMATION';
+            const billText = `Found your usual order! 🍽️\n\n` + formatItemizedBill(session.cart, storeName) +
+              `\n\nWould you like to confirm this order? (Reply *"Yes"* or *"Confirm"* to proceed)`;
+            await sock.sendMessage(from, { text: billText });
+            continue;
+          } else {
+            await sock.sendMessage(from, {
+              text: `I don't have your usual order saved yet! What would you like to have today? You can browse our menu or name any item.`
+            });
+            continue;
+          }
+        }
+
+        // =========================================================================
+        // STATE 5: Order Items Detected (e.g. "1 coke 2 pizza 3 biryani", "1 coke")
+        // SHOW ORDER TOGETHER AS AN ITEMIZED BILL
+        // =========================================================================
+        const matchedItems = extractOrderItems(effectiveText, activeStoreConfig.catalog);
+        const isDoneIntent = /\b(done|that's all|thats all|bas|bas itna|bas itna hi|finish|finished|complete|khatam|itna hi|nothing else)\b/i.test(lowerText);
+
+        if (matchedItems.length > 0) {
+          addToCart(session, matchedItems);
+
+          if (isDoneIntent) {
+            session.status = 'AWAITING_CONFIRMATION';
+            const billText = formatItemizedBill(session.cart, storeName) +
+              `\n\nWould you like to confirm this order? (Reply *"Yes"* or *"Confirm"* to proceed)`;
+            await sock.sendMessage(from, { text: billText });
+            continue;
+          } else {
+            session.status = 'COLLECTING';
+            const billText = formatItemizedBill(session.cart, storeName) +
+              `\n\nWould you like to add anything else? (Reply with more items, or say *"DONE"* to confirm and place your order)`;
+            await sock.sendMessage(from, { text: billText });
+            continue;
+          }
+        }
+
+        // =========================================================================
+        // STATE 6: "DONE" Trigger without new items
+        // =========================================================================
+        if (isDoneIntent) {
+          if (session.cart.length > 0) {
+            session.status = 'AWAITING_CONFIRMATION';
+            const billText = formatItemizedBill(session.cart, storeName) +
+              `\n\nWould you like to confirm this order? (Reply *"Yes"* or *"Confirm"* to proceed)`;
+            await sock.sendMessage(from, { text: billText });
+            continue;
+          } else {
+            await sock.sendMessage(from, {
+              text: `Your order is currently empty! What would you like to have today? You can browse our menu or name any item.`
+            });
+            continue;
+          }
+        }
+
+        // =========================================================================
+        // STATE 7: Out-of-Menu Guardrail
+        // =========================================================================
+        const outOfMenuItems = ['burger', 'pasta', 'noodles', 'sushi', 'taco', 'sandwich', 'ice cream', 'roti', 'dosa', 'idli'];
+        const matchedOom = outOfMenuItems.find(oom => lowerText.includes(oom));
+        if (matchedOom) {
+          const suggestions = activeStoreConfig.catalog.slice(0, 3).map(i => `• *${i.name}* (₹${i.price})`).join('\n');
+          const reply = `Sorry, *${matchedOom}* isn't available with us right now. Would you like to try something from our fresh specialties?\n${suggestions}`;
+          await sock.sendMessage(from, { text: reply });
+          continue;
+        }
+
+        // =========================================================================
+        // STATE 8: General Assistant Conversations / Multimodal (Gemini 3 Flash)
+        // =========================================================================
         try {
-          await sock.sendMessage(from, { text: botReply });
-        } catch (sendErr) {
-          console.error(`Failed to send WhatsApp message to ${from}:`, sendErr);
+          const reply = await processWithGemini(from, incomingMedia, effectiveText, activeStoreConfig);
+          if (reply) {
+            await sock.sendMessage(from, { text: reply });
+            console.log(`📤 [WhatsApp] Replying to ${from}: "${reply.slice(0, 100)}..."`);
+          }
+        } catch (procErr) {
+          console.error('Error during message processing:', procErr.message);
+          const fallback = generateFallbackReply(effectiveText, activeStoreConfig, customer);
+          await sock.sendMessage(from, { text: fallback });
         }
       }
     });
@@ -365,26 +941,17 @@ async function startWhatsAppSocket() {
   }
 }
 
-// 9. Socket.IO Connection & Frontend Event Listeners
+// 14. Socket.IO Connection & Frontend Event Listeners
 io.on('connection', (socket) => {
   console.log(`🔌 Frontend client connected: ${socket.id}`);
 
-  // Send immediate status upon connection
   socket.emit('wa:status', currentStatus);
   if (lastQrDataUrl && currentStatus.state === 'qr') {
     socket.emit('wa:qr', lastQrDataUrl);
   }
 
-  // Handle launch-store-bot event from "Launch WhatsApp Store & Go Live 🚀" button
   socket.on('launch-store-bot', async (payload) => {
     console.log('🚀 Received launch-store-bot event from frontend:');
-    console.log(`   • Store: "${payload.storeName || activeStoreConfig.storeName}"`);
-    console.log(`   • Phone: "${payload.phone || activeStoreConfig.phone}"`);
-    console.log(`   • Occupation: "${payload.occupation || activeStoreConfig.occupation}"`);
-    console.log(`   • Delivery Mode: "${payload.deliveryMode || activeStoreConfig.deliveryMode}"`);
-    console.log(`   • Catalog SKUs: ${payload.catalog ? payload.catalog.length : 0} items`);
-    console.log(`   • Active Stages: ${payload.activeStages ? payload.activeStages.length : 0} stages`);
-
     if (payload) {
       activeStoreConfig = {
         storeName: payload.storeName || activeStoreConfig.storeName,
@@ -396,7 +963,6 @@ io.on('connection', (socket) => {
       };
     }
 
-    // Start Baileys socket if not already open
     if (!sock || currentStatus.state === 'disconnected') {
       startWhatsAppSocket();
     } else {
@@ -412,21 +978,26 @@ io.on('connection', (socket) => {
   });
 });
 
-// 10. HTTP Health Check & API routes
+// 15. HTTP Endpoints
 app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
     waStatus: currentStatus,
     store: activeStoreConfig.storeName,
-    catalogCount: activeStoreConfig.catalog.length
+    agentId: SARVAM_AGENT_ID,
+    catalogCount: activeStoreConfig.catalog.length,
+    customersInMemory: customerStore.size
   });
 });
 
-// 11. Start Server on Port 3001
+// 16. Start Server on Port 3001
 httpServer.listen(PORT, () => {
   console.log(`=======================================================`);
-  console.log(`🚀 WhatsApp Bot Control Server running at http://localhost:${PORT}`);
-  console.log(`   • Socket.IO ready on port ${PORT}`);
-  console.log(`   • Listening for 'launch-store-bot' event`);
+  console.log(`🚀 Cafe Vaidehi WhatsApp Assistant Live on http://localhost:${PORT}`);
+  console.log(`   • Sarvam Agent ID: ${SARVAM_AGENT_ID}`);
+  console.log(`   • UPI VPA: ${UPI_VPA}`);
+  console.log(`   • Multi-Turn Cart Accumulation & Itemized Billing`);
+  console.log(`   • Dynamic Pre-Fed UPI QR Code & Tap-To-Pay Link`);
+  console.log(`   • Multimodal: Voice (STT) + Photos (OCR) + Visual Cards`);
   console.log(`=======================================================`);
 });

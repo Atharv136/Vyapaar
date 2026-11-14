@@ -43,3 +43,7 @@ lerna-debug.log*
 *.swo
 .DS_Store
 Thumbs.db
+
+# WhatsApp Session Auth
+auth_info/
+**/auth_info/
