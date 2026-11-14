@@ -8,7 +8,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="designuicss.css" />
-  <script src="http://localhost:3001/socket.io/socket.io.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    // Fallback if served from a separate static port (e.g. Live Server on 5500)
+    if (typeof io === 'undefined') {
+      document.write('<script src="http://localhost:3001/socket.io/socket.io.js"><\/script>');
+    }
+  </script>
 </head>
 <body>
 
@@ -2456,14 +2462,17 @@
         return null;
       }
       try {
-        waLiveSocket = io('http://localhost:3001', {
+        const socketTarget = (window.location.protocol.startsWith('http') && window.location.hostname !== '')
+          ? window.location.origin
+          : 'http://localhost:3001';
+        waLiveSocket = io(socketTarget, {
           transports: ['websocket', 'polling'],
           reconnectionAttempts: 10,
           reconnectionDelay: 1000
         });
 
         waLiveSocket.on('connect', () => {
-          console.log('✅ Connected to WhatsApp Bot backend at http://localhost:3001');
+          console.log('✅ Connected to WhatsApp Bot backend at ' + socketTarget);
         });
 
         waLiveSocket.on('wa:status', (data) => {

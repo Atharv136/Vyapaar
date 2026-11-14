@@ -1,0 +1,31 @@
+{
+    "$schema": "https://openapi.vercel.sh/vercel.json",
+    "services": {
+        "api": {
+            "root": "apps/api",
+            "framework": "fastify"
+        },
+        "dashboard": {
+            "root": "apps/dashboard",
+            "framework": "vite"
+        },
+        "whatsapp-bot-control": {
+            "root": "whatsapp-bot-control",
+            "framework": "express"
+        }
+    },
+    "rewrites": [
+        {
+            "source": "/api/(.*)",
+            "destination": {
+                "service": "api"
+            }
+        },
+        {
+            "source": "/(.*)",
+            "destination": {
+                "service": "dashboard"
+            }
+        }
+    ]
+}

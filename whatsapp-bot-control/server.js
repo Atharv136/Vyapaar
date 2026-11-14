@@ -31,7 +31,7 @@ process.on('unhandledRejection', (reason) => {
 dotenv.config({ path: path.join(__dirname, '../.env') });
 dotenv.config({ path: path.join(__dirname, '.env'), override: true });
 
-const PORT            = 3001;
+const PORT            = process.env.PORT || 3001;
 const UPI_VPA         = process.env.UPI_VPA         || 'cafevaidehi.demo@upi';
 const SARVAM_API_KEY  = (process.env.SARVAM_API_KEY  || '').trim();
 const SARVAM_AGENT_ID = process.env.SARVAM_AGENT_ID  || 'whatsapp-ch-779ea7d0-dd9c';

@@ -5,6 +5,9 @@
   "type": "module",
   "packageManager": "pnpm@12.18.0",
   "scripts": {
+    "start": "node whatsapp-bot-control/server.js",
+    "bot": "node whatsapp-bot-control/server.js",
+    "bot:dev": "node --watch whatsapp-bot-control/server.js",
     "dev": "pnpm --filter @vyapaar/api dev",
     "api:dev": "pnpm --filter @vyapaar/api dev",
     "build": "pnpm -r --if-present build",

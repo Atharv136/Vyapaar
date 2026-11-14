@@ -1,0 +1,16 @@
+# Local Environment
+.env
+.env*.local
+
+# Baileys WhatsApp Session Keys (DO NOT COMMIT)
+auth_info/
+**/auth_info/
+session/
+*creds.json*
+
+# Dependencies
+node_modules/
+
+# Logs
+*.log
+logs/
