@@ -29,3 +29,4 @@ EXPOSE 3001
 
 # Start the unified backend & static UI
 CMD ["node", "whatsapp-bot-control/server.js"]
+

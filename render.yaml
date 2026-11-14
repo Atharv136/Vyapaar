@@ -26,3 +26,4 @@ services:
         value: cafevaidehi.demo@upi
       - key: STORE_NAME
         value: The Daily Spice Café & Kitchen
+
