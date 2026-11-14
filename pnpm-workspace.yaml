@@ -4,3 +4,8 @@ packages:
   - "whatsapp-bot-control"
 
 blockExoticSubdeps: false
+
+onlyBuiltDependencies:
+  - "@whiskeysockets/baileys"
+  - "esbuild"
+  - "protobufjs"
