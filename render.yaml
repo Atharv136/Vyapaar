@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: vyapaar-whatsapp-store
+    env: node
+    plan: starter
+    buildCommand: cd whatsapp-bot-control && npm install
+    startCommand: node whatsapp-bot-control/server.js
+    disk:
+      name: wa-session-data
+      mountPath: /app/whatsapp-bot-control/auth_info
+      sizeGB: 1
+    envVars:
+      - key: PORT
+        value: 3001
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-3.8-flash
+      - key: SARVAM_API_KEY
+        sync: false
+      - key: SARVAM_AGENT_ID
+        value: whatsapp-ch-779ea7d0-dd9c
+      - key: OCR_SPACE_API_KEY
+        value: 51c4e9533888957
+      - key: UPI_VPA
+        value: cafevaidehi.demo@upi
+      - key: STORE_NAME
+        value: The Daily Spice Café & Kitchen
