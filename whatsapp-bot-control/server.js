@@ -319,54 +319,83 @@ async function transcribeAudio(base64Audio, mimeType) {
     console.warn('⚠️ [Audio STT] Cannot transcribe voice note: GEMINI_API_KEY is not configured in whatsapp-bot-control/.env!');
     return null;
   }
+  const cleanMime = (mimeType || 'audio/ogg').split(';')[0];
+  const prompt = 'Transcribe this WhatsApp voice note audio accurately. ' +
+                'The user might speak in Hindi, Hinglish, Marathi, English, or any Indian regional language. ' +
+                'Output ONLY the transcribed words in the exact same language/dialect spoken. ' +
+                'Do NOT explain, summarize, or translate. Just return the transcript.';
+
+  // Attempt 1: gemini-3.8-flash via SDK
   try {
-    console.log(`🎙️ Transcribing voice note with Gemini (${(mimeType || 'audio/ogg').split(';')[0]})...`);
+    console.log(`🎙️ Transcribing voice note with Gemini 3.8 Flash (${cleanMime})...`);
     const response = await aiClient.models.generateContent({
-      model   : 'gemini-2.0-flash',
+      model   : 'gemini-3.8-flash',
       contents: [{
         role : 'user',
         parts: [
-          {
-            inlineData: {
-              mimeType: (mimeType || 'audio/ogg').split(';')[0],
-              data    : base64Audio
-            }
-          },
-          {
-            text: 'Transcribe this WhatsApp voice note audio accurately. ' +
-                  'The user might speak in Hindi, Hinglish, Marathi, English, or any Indian regional language. ' +
-                  'Output ONLY the transcribed words in the exact same language/dialect spoken. ' +
-                  'Do NOT explain, summarize, or translate. Just return the transcript.'
-          }
+          { inlineData: { mimeType: cleanMime, data: base64Audio } },
+          { text: prompt }
         ]
       }],
       config: { temperature: 0.1 }
     });
     const t = response.text?.trim();
-    if (t) console.log(`🎙️ STT transcription succeeded: "${t}"`);
-    return t || null;
+    if (t) {
+      console.log(`🎙️ STT transcription succeeded: "${t}"`);
+      return t;
+    }
   } catch (e) {
-    console.warn('⚠️ Gemini STT error:', e.message);
-    // Try fallback to gemini-1.5-flash if main fails
-    try {
-      const response2 = await aiClient.models.generateContent({
-        model   : 'gemini-1.5-flash',
+    console.warn('⚠️ Gemini 3.8 Flash STT error:', e.message);
+  }
+
+  // Attempt 2: gemini-flash-latest via SDK
+  try {
+    const response2 = await aiClient.models.generateContent({
+      model   : 'gemini-flash-latest',
+      contents: [{
+        role : 'user',
+        parts: [
+          { inlineData: { mimeType: cleanMime, data: base64Audio } },
+          { text: prompt }
+        ]
+      }]
+    });
+    const t2 = response2.text?.trim();
+    if (t2) {
+      console.log(`🎙️ Fallback STT result: "${t2}"`);
+      return t2;
+    }
+  } catch (e2) {
+    console.warn('⚠️ Fallback Gemini STT error:', e2.message);
+  }
+
+  // Attempt 3: Direct REST API call (v1beta)
+  try {
+    console.log('🎙️ Trying direct REST API for transcription...');
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${GEMINI_API_KEY}`;
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
         contents: [{
-          role : 'user',
           parts: [
-            { inlineData: { mimeType: (mimeType || 'audio/ogg').split(';')[0], data: base64Audio } },
-            { text: 'Transcribe this audio note accurately. Output only the transcript.' }
+            { inlineData: { mimeType: cleanMime, data: base64Audio } },
+            { text: prompt }
           ]
         }]
-      });
-      const t2 = response2.text?.trim();
-      if (t2) console.log(`🎙️ Fallback STT result: "${t2}"`);
-      return t2 || null;
-    } catch (e2) {
-      console.warn('⚠️ Fallback Gemini STT error:', e2.message);
-      return null;
+      })
+    });
+    const data = await res.json();
+    const t3 = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+    if (t3) {
+      console.log(`🎙️ Direct REST STT succeeded: "${t3}"`);
+      return t3;
     }
+  } catch (e3) {
+    console.warn('⚠️ Direct REST STT error:', e3.message);
   }
+
+  return null;
 }
 
 // ─── 9. OCR.space — Photo to Text ────────────────────────────────────────────
@@ -389,29 +418,49 @@ async function ocrPhoto(buffer, mimeType) {
   }
 }
 
-// ─── 10. Visual Menu Cards ────────────────────────────────────────────────────
+// ─── 10. Single Visual Menu Card ──────────────────────────────────────────────
 async function sendMenuCards(sock, to, catalog, storeName) {
   const imagesDir = path.resolve(__dirname, '../images');
+  const singleMenuPath = path.join(imagesDir, 'menu.jpg');
+
+  const caption =
+    `🍽️ *${storeName || 'The Daily Spice Café & Kitchen'} — Official Menu Card*\n\n` +
+    `Here is our full menu! 📜\n\n` +
+    `What would you like to order today? You can:\n` +
+    `• Reply with items (e.g. *"1 coke 2 pizza"* or *"do plate babycorn"*)\n` +
+    `• Send a voice note 🎙️\n` +
+    `• Send a photo of your handwritten order 📷\n` +
+    `• Or say *"order my usual"*!`;
+
+  if (fs.existsSync(singleMenuPath)) {
+    try {
+      const buf = fs.readFileSync(singleMenuPath);
+      await sock.sendMessage(to, { image: buf, caption });
+      console.log(`📜 Sent single menu card image to ${to}`);
+      return;
+    } catch (e) {
+      console.error('Menu card image send error:', e.message);
+    }
+  }
+
+  // Fallback: send individual item cards if menu.jpg not found
   for (const item of catalog) {
     let buf = null;
     if (item.image) {
       const fp = path.join(imagesDir, path.basename(item.image));
       if (fs.existsSync(fp)) buf = fs.readFileSync(fp);
     }
-    const caption =
+    const itemCaption =
       `🍽️ *${item.name}*\n` +
       `🏷️ ${item.cat || 'Special'} | 💰 *₹${item.price}*\n` +
       `⚡ _${item.stock || 'Available'}_`;
     try {
-      if (buf) await sock.sendMessage(to, { image: buf, caption });
-      else     await sock.sendMessage(to, { text : caption });
+      if (buf) await sock.sendMessage(to, { image: buf, caption: itemCaption });
+      else     await sock.sendMessage(to, { text : itemCaption });
     } catch (e) { console.error(`Card send error (${item.name}):`, e.message); }
     await new Promise(r => setTimeout(r, 200));
   }
-  await sock.sendMessage(to, {
-    text: `Here is our full menu at *${storeName}*! 🍽️\n\n` +
-          `Tell me what you'd like to order — text or voice note!`
-  });
+  await sock.sendMessage(to, { text: caption });
 }
 
 // ─── 11. Local Fallback (no Sarvam key / Sarvam down) ────────────────────────
@@ -654,8 +703,9 @@ async function startSocket() {
         }
 
         // ── 3. Visual menu request ────────────────────────────────────────
-        const isMenuQuery = /^(menu|catalog)$/.test(lc) ||
-          /show (menu|dishes)|what('s| is) (the menu|there to eat)|kya milega|menu card/i.test(lc);
+        const isMenuQuery = /^(menu|catalog|menu card|rate card|price list)$/i.test(lc) ||
+          /\b(show|send|share|give|see|view|check|display|want)\b.*\b(menu|catalog|card|list)\b/i.test(lc) ||
+          /\b(menu dikhao|menu bhejo|kya milega|kya hai|menu please|food menu|dishes|the menu)\b/i.test(lc);
         if (isMenuQuery) {
           await sendMenuCards(sock, from, activeStoreConfig.catalog, storeName);
           continue;
