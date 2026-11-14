@@ -3,7 +3,15 @@
     "services": {
         "api": {
             "root": "apps/api",
-            "framework": "fastify"
+            "framework": "fastify",
+            "bindings": [
+                {
+                    "type": "service",
+                    "service": "whatsapp-bot-control",
+                    "format": "url",
+                    "env": "WHATSAPP_BOT_URL"
+                }
+            ]
         },
         "dashboard": {
             "root": "apps/dashboard",
